@@ -1,32 +1,40 @@
-from sqlalchemy import MetaData, String, Integer, Date, Boolean, Table, Column, JSON, TIMESTAMP, ForeignKey
+from datetime import datetime
 
-metadata = MetaData()
+from sqlalchemy import JSON, func, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-users = Table(
-    'users',
-    metadata,
-    Column('id', Integer, primary_key=True),
-    Column('login', String, nullable=False, unique=True),
-    Column('password', String, nullable=False, unique=True),
-)
+from models.db import Base
 
-dishes = Table(
-    'dishes',
-    metadata,
-    Column('id', Integer, primary_key=True),
-    Column('title', String, nullable=False),
-    Column('recipe', Integer, unique=True),
-    Column('out', Integer),
-    Column('price', Integer),
-    Column('prop_dish', JSON),
-)
 
-menus = Table(
-    'menus',
-    metadata,
-    Column('id', Integer, primary_key=True),
-    Column('date', TIMESTAMP, nullable=False),
-    Column('type', String, nullable=False),
-    Column('category', String),
-    Column('dish_id', Integer, ForeignKey('dishes.id')),
-)
+class User(Base):
+    __tablename__ = 'users'
+
+    login: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[str] = mapped_column(unique=True)
+
+class Dish(Base):
+    __tablename__ = 'dishes'
+
+    title: Mapped[str]
+    recipe: Mapped[int]
+    out_gramm: Mapped[int]
+    price: Mapped[float]
+    prop_dish: Mapped[dict] = mapped_column(JSON)
+    menus: Mapped[list['Menu']] = relationship(
+        'Menu',
+        back_populates='dish',
+        cascade='all, delete-orphan'
+    )
+
+
+class Menu(Base):
+    __tablename__ = 'menus'
+
+    date_menu: Mapped[datetime] = mapped_column(server_default=func.now())
+    type_menu: Mapped[str]
+    category_menu: Mapped[str]
+    dish_id: Mapped[int] = mapped_column(ForeignKey('dishes.id'))
+    dish: Mapped['Dish'] = relationship(
+        'Dish',
+        back_populates='menus'
+    )
