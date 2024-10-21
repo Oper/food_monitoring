@@ -6,14 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="177e5d7e-0ed8-4edd-ac26-5489ddca35e8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic.ini" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/README" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/script.py.mako" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/4e3499d2606f_db_init.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,7 +167,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729400059068</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="SQLalchemy CORE to ORM&#10;Delete old DB first INIT alembic&#10;alembic new migration not init">
+      <option name="closed" value="true" />
+      <created>1729497505425</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1729497505425</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -181,6 +183,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Init rep" />
-    <option name="LAST_COMMIT_MESSAGE" value="Init rep" />
+    <MESSAGE value="SQLalchemy CORE to ORM&#10;Delete old DB first INIT alembic&#10;alembic new migration not init" />
+    <option name="LAST_COMMIT_MESSAGE" value="SQLalchemy CORE to ORM&#10;Delete old DB first INIT alembic&#10;alembic new migration not init" />
   </component>
 </project>

@@ -1,11 +1,11 @@
-import datetime
+from datetime import datetime
 from asyncio import run
 
 from sqlalchemy import Integer, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, declared_attr
 
-import config
+from app import config
 
 DATABASE_URL = config.get_link_db('postgresql+asyncpg')
 
@@ -41,7 +41,8 @@ def connection(method):
 
 @connection
 async def get_user(login: str, session):
-    return await session.query(User).filter_by(login=login)
+    pass
+    #return await session.query(User).filter_by(login=login)
 
 
-user = run(get_user('admin'))
+#user = run(get_user('admin'))
