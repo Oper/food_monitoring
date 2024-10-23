@@ -88,7 +88,7 @@ async def nutritions(request: Request):
             if _.date_menu.isoformat() not in menu_list:
                 menu_list.append(_.date_menu.isoformat())
     menu_list.sort()
-    print(current_date)
+
     return templates.TemplateResponse(request=request, name='nutritions.html',
                                       context={'title': title, 'date_todey': current_date, 'menu_list': menu_list})
 
@@ -101,7 +101,6 @@ async def menu_in_date(menu: str, request: Request):
     menu_today = {}
     if menus_db_by_day:
         for _ in menus_db_by_day:
-            print(_.category_menu)
             if _.category_menu not in menu_today:
                 menu_today[_.category_menu] = {}
             if _.type_menu not in menu_today[_.category_menu]:
@@ -167,7 +166,7 @@ async def admin_nutritions(request: Request):
         if _.type_menu not in menus[date][_.category_menu]:
             menus[date][_.category_menu][_.type_menu] = []
         dish = await get_dish_by_id(dish_id=_.dish_id)
-        print(menus)
+
         menus[date][_.category_menu][_.type_menu].append({
             'dish_id': dish['id'],
             'dish_title': dish['title'],
@@ -179,7 +178,6 @@ async def admin_nutritions(request: Request):
             'dish_carb': dish['carb'],
             'dish_price': dish['price']
         })
-    print(menus_db)
-    print(*menus)
+
     return templates.TemplateResponse(request=request, name='admin_nutritions.html',
                                       context={'title': title, 'dishes': dishes, 'menus': menus})
