@@ -12,7 +12,7 @@
 <div class="container-md">
     <ul class="nav justify-content-end">
         <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
-        <li class="nav-item"><a href="../nutrition" class="nav-link px-2 text-body-secondary">Список меню</a></li>
+        <li class="nav-item"><a href="../nutritions" class="nav-link px-2 text-body-secondary">Список меню</a></li>
         <li class="nav-item"><a href="../logout" class="nav-link px-2 text-body-secondary">Выход</a></li>
     </ul>
     <h3 class="text-center">{{ title }}</h3>
@@ -51,11 +51,7 @@
                 </tbody>
                 {% endfor %}
             </table>
-            {% for cat, msg in get_flashed_messages(True) %}
-            <div class="alert {{ cat }}" role="alert">
-                {{ msg }}
-            </div>
-            {% endfor %}
+
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dishDataModal">
                     Добавить блюдо
@@ -127,43 +123,42 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form class="row g-3 align-items-center" method="post" name="dish">
-
+                <form class="row g-3 align-items-center" action="/send_dish/" method="post" name="dish">
                     <div class="row g-1">
                         <div class="col">
                             <div class="input-group">
                                 <span class="input-group-text">Название</span>
-                                <input type="text" aria-label="Название" class="form-control" name="dish_title">
+                                <input type="text" aria-label="Название" class="form-control" name="title">
                             </div>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Номер рецептурника</span>
                                 <input type="number" aria-label="Номер рецептурника" class="form-control"
-                                       name="dish_recipe">
+                                       name="recipe">
                             </div>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Выход</span>
-                                <input type="number" aria-label="Выход" class="form-control" name="dish_out">
+                                <input type="number" aria-label="Выход" class="form-control" name="out_gramm">
                             </div>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Калории</span>
-                                <input type="number" aria-label="Калории" class="form-control" name="dish_calories">
+                                <input type="number" aria-label="Калории" class="form-control" name="calories">
                             </div>
                             <br>
                             <div class="input-group">
                                 <input type="number" placeholder="Белки" aria-label="Белки" class="form-control"
-                                       name="dish_protein">
+                                       name="protein">
                                 <input type="number" placeholder="Жиры" aria-label="Жиры" class="form-control"
-                                       name="dish_fats">
+                                       name="fats">
                                 <input type="number" placeholder="Углеводы" aria-label="Углеводы" class="form-control"
-                                       name="dish_carb">
+                                       name="carb">
                             </div>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Цена</span>
-                                <input type="number" aria-label="Цена" class="form-control" name="dish_price">
+                                <input type="number" aria-label="Цена" class="form-control" name="price" value="0">
                             </div>
                             <br>
                             <input class="d-none" name="type_form" type="text" value="dish">
@@ -189,18 +184,17 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form class="row g-3 align-items-center" method="post" name="menu">
-
+                <form class="row g-3 align-items-center" action="/send_menu/" method="post" name="menu">
                     <div class="row g-1">
                         <div class="col">
                             <div class="input-group">
                                 <span class="input-group-text">Дата</span>
-                                <input type="date" aria-label="Дата" class="form-control" name="menu_date" required>
+                                <input type="date" aria-label="Дата" class="form-control" name="date" required>
                             </div>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Тип меню</span>
-                                <select class="form-select" name="menu_type">
+                                <select class="form-select" name="type">
                                     <option>Завтрак</option>
                                     <option>Обед</option>
                                 </select>
@@ -208,7 +202,7 @@
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Категория</span>
-                                <select class="form-select" name="menu_category">
+                                <select class="form-select" name="category">
                                     <option>1-4 классы</option>
                                     <option>ОВЗ</option>
                                     <option>СОЦ</option>
@@ -218,7 +212,7 @@
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Блюдо</span>
-                                <select class="form-select" name="menu_dish">
+                                <select class="form-select" name="dish">
                                     {% for j_key, j_value in dishes.items() %}
                                     {% for item in j_value %}
                                     <option value="{{ item.id }}">{{ j_key }}</option>

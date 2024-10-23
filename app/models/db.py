@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import Integer, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, declared_attr
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, declared_attr, class_mapper
 
 from app import config
 
@@ -20,6 +20,11 @@ class Base(AsyncAttrs, DeclarativeBase):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
+    def to_dict(self) -> dict:
+        """Универсальный метод для конвертации объекта SQLAlchemy в словарь"""
+        columns = class_mapper(self.__class__).columns
+        return {column.key: getattr(self, column.key) for column in columns}
+
     @declared_attr.directive
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
@@ -35,5 +40,4 @@ def connection(method):
                 raise e
             finally:
                 await session.close()
-
     return wrapper

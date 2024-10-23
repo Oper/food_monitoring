@@ -12,7 +12,7 @@ DB_PASS = os.environ.get('DB_PASS')
 def get_link_db(driver: str) -> str:
     """
     using your DB
-    :param driver: postgresql, sqlite, mysql
+    :param driver: postgresql+asyncpg, sqlite+aiosqlite, mysql
     :return:
     """
     return f'{driver}://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'

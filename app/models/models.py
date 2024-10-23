@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date
 
-from sqlalchemy import JSON, func, ForeignKey
+from sqlalchemy import  func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.db import Base
@@ -19,7 +19,10 @@ class Dish(Base):
     recipe: Mapped[int]
     out_gramm: Mapped[int]
     price: Mapped[float]
-    prop_dish: Mapped[dict] = mapped_column(JSON)
+    calories: Mapped[float]
+    protein: Mapped[float]
+    fats: Mapped[float]
+    carb: Mapped[float]
     menus: Mapped[list['Menu']] = relationship(
         'Menu',
         back_populates='dish',
@@ -30,7 +33,7 @@ class Dish(Base):
 class Menu(Base):
     __tablename__ = 'menus'
 
-    date_menu: Mapped[datetime] = mapped_column(server_default=func.now())
+    date_menu: Mapped[date] = mapped_column(server_default=func.now())
     type_menu: Mapped[str]
     category_menu: Mapped[str]
     dish_id: Mapped[int] = mapped_column(ForeignKey('dishes.id'))
