@@ -23,3 +23,14 @@ class BaseCRUD:
         result = await session.execute(query)
         records = result.scalars().all()
         return records
+
+    @classmethod
+    async def delete(cls, session: AsyncSession, id: int):
+        query = select(cls.model).filter_by(id=id)
+        result = await session.execute(query)
+        item_db = result.scalar_one_or_none()
+        if item_db:
+            await session.delete(item_db)
+            await session.commit()
+            return True
+        return False
