@@ -1,4 +1,6 @@
-from datetime import date, timedelta, datetime
+from datetime import date, datetime
+from typing import Annotated
+from venv import logger
 
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
@@ -16,6 +18,18 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
+class DishPydanticIn(BaseModel):
+    title: str
+    recipe: int
+    out_gramm: int
+    price: float
+    calories: float
+    protein: float
+    fats: float
+    carb: float
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
 class DishPydantic(BaseModel):
     id: int
     title: str
@@ -30,7 +44,7 @@ class DishPydantic(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 class MenuPydantic(BaseModel):
-    date_menu: datetime
+    date_menu: date
     type_menu: str
     category_menu: str
     dish_id: int
@@ -81,12 +95,13 @@ async def main(request: Request):
 async def nutritions(request: Request):
     title = 'Питание МБОУ "СОШ№1" г.Емвы'
     menu_list = []
-    current_date = date.today()
+    current_date = date.today().isoformat()
     row = await get_menus()
     if row:
         for _ in row:
-            if _.date_menu.isoformat() not in menu_list:
-                menu_list.append(_.date_menu.isoformat())
+            cur_menu = _.date_menu.isoformat()
+            if cur_menu not in menu_list:
+                menu_list.append(cur_menu)
     menu_list.sort()
 
     return templates.TemplateResponse(request=request, name='nutritions.html',
@@ -121,16 +136,20 @@ async def menu_in_date(menu: str, request: Request):
 
 
 @app.post('/send_dish/')
-async def create_dish(request: Request, title = Form(), recipe = Form(), out_gramm = Form(), price = Form(), calories = Form(), protein = Form(), fats = Form(), carb = Form()):
-    new_dish = await add_dish(title=title, recipe=int(recipe), out_gramm=int(out_gramm),
-                              price=float(price), calories=float(calories), protein=float(protein), fats=float(fats), carb=float(carb))
+async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()]):
+    try:
+        new_dish = await add_dish(title=data.title, recipe=data.recipe, out_gramm=data.out_gramm, price=data.price, calories=data.calories, protein=data.protein, fats=data.fats, carb=data.carb)
+    except Exception as e:
+        logger.error(e)
     redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/send_menu/')
-async def create_menu(request: Request, date = Form(), type = Form(), category = Form(), dish = Form()):
-    date_menu = date.strptime(date, '%Y-%m-%d')
-    new_menu = await add_menu(date_menu=date_menu, type_menu=type, category_menu=category, dish_id=int(dish))
+async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()]):
+    try:
+        new_menu = await add_menu(date_menu=data.date_menu, type_menu=data.type_menu, category_menu=data.category_menu, dish_id=data.dish_id)
+    except Exception as e:
+        logger.error(e)
     redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
