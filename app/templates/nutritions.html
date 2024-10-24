@@ -17,7 +17,7 @@
         </li>
     </ul>
     <h3 class="text-center">{{ title }}</h3>
-    <h5>Список меню за последние 5 дней:</h5>
+    <h5>Список меню на 3 дня (вчера, сегодня и завтра):</h5>
     <div class="row row-cols-1 row-cols-md-2 g-6">
         {% for item in menu_list %}
         <div class="col">
@@ -27,7 +27,7 @@
                 <strong>Ежедневное меню на:</strong>
             </div>
             <div class="card-body">
-                <h4 class="card-title">{{ item if item != date_todey else item.isoformat() + " (Сегодня)" }}</h4>
+                <h4 class="card-title">{{ item if item != date_todey else item + " (Сегодня)" }}</h4>
                 <p class="card-text">Нажмите на кнопку ниже, чтобы открыть карточку меню</p>
                 <a href="{{ item }}" class="btn btn-primary">Открыть меню</a>
             </div>

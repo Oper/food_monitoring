@@ -189,12 +189,12 @@
                         <div class="col">
                             <div class="input-group">
                                 <span class="input-group-text">Дата</span>
-                                <input type="date" aria-label="Дата" class="form-control" name="date" required>
+                                <input type="date" aria-label="Дата" class="form-control" name="date_menu" required>
                             </div>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Тип меню</span>
-                                <select class="form-select" name="type">
+                                <select class="form-select" name="type_menu" type="text">
                                     <option>Завтрак</option>
                                     <option>Обед</option>
                                 </select>
@@ -202,7 +202,7 @@
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Категория</span>
-                                <select class="form-select" name="category">
+                                <select class="form-select" name="category_menu" type="text">
                                     <option>1-4 классы</option>
                                     <option>ОВЗ</option>
                                     <option>СОЦ</option>
@@ -212,7 +212,7 @@
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Блюдо</span>
-                                <select class="form-select" name="dish">
+                                <select class="form-select" name="dish_id">
                                     {% for j_key, j_value in dishes.items() %}
                                     {% for item in j_value %}
                                     <option value="{{ item.id }}">{{ j_key }}</option>
