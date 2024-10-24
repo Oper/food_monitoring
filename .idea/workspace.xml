@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="177e5d7e-0ed8-4edd-ac26-5489ddca35e8" name="Changes" comment="Add db revisions">
+    <list default="true" id="177e5d7e-0ed8-4edd-ac26-5489ddca35e8" name="Changes" comment="delete debug prints">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/crud/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/crud/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/admin_nutritions.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/admin_nutritions.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/nutritions.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/nutritions.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -228,7 +232,8 @@
       <workItem from="1729514503251" duration="1136000" />
       <workItem from="1729515658125" duration="8709000" />
       <workItem from="1729584922218" duration="23239000" />
-      <workItem from="1729661670025" duration="3712000" />
+      <workItem from="1729661670025" duration="4099000" />
+      <workItem from="1729686990529" duration="5076000" />
     </task>
     <task id="LOCAL-00001" summary="Init rep">
       <option name="closed" value="true" />
@@ -286,7 +291,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729665358612</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="delete debug prints">
+      <option name="closed" value="true" />
+      <created>1729665521660</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1729665521660</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -304,9 +317,10 @@
     <MESSAGE value="add static files (bootstrap...)" />
     <MESSAGE value="ferst worked version" />
     <MESSAGE value="Add db revisions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add db revisions" />
+    <MESSAGE value="delete debug prints" />
+    <option name="LAST_COMMIT_MESSAGE" value="delete debug prints" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/food_monitoring$main.coverage" NAME="main Coverage Results" MODIFIED="1729665391952" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="E:\Documents\myProjects\food_monitoring\app" />
+    <SUITE FILE_PATH="coverage/food_monitoring$main.coverage" NAME="main Coverage Results" MODIFIED="1729759207892" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="E:\Documents\myProjects\food_monitoring\app" />
   </component>
 </project>
