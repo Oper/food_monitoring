@@ -73,8 +73,10 @@ async def get_menus_by_day(session, date_menu: date):
 
 @connection
 async def get_dishes(session):
-    dishes = await DishCRUD.get_all(session)
-    return dishes
+    row = await DishCRUD.get_all(session)
+    if row:
+        return row
+    return None
 
 @connection
 async def add_dish(session, **kwargs):
