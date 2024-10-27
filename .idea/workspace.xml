@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="177e5d7e-0ed8-4edd-ac26-5489ddca35e8" name="Changes" comment="delete debug prints">
+    <list default="true" id="177e5d7e-0ed8-4edd-ac26-5489ddca35e8" name="Changes" comment="Other">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/crud/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/crud/base.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/admin_nutritions.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/admin_nutritions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/nutritions.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/nutritions.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -233,7 +231,9 @@
       <workItem from="1729515658125" duration="8709000" />
       <workItem from="1729584922218" duration="23239000" />
       <workItem from="1729661670025" duration="4099000" />
-      <workItem from="1729686990529" duration="5076000" />
+      <workItem from="1729686990529" duration="11633000" />
+      <workItem from="1729957390874" duration="1536000" />
+      <workItem from="1730011332250" duration="6238000" />
     </task>
     <task id="LOCAL-00001" summary="Init rep">
       <option name="closed" value="true" />
@@ -299,7 +299,39 @@
       <option name="project" value="LOCAL" />
       <updated>1729665521660</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Add Pydantic models for input Dish and Menu">
+      <option name="closed" value="true" />
+      <created>1729759346655</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1729759346655</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Add @classmetod delete">
+      <option name="closed" value="true" />
+      <created>1729759378823</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1729759378823</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Changes for Pyndantic models">
+      <option name="closed" value="true" />
+      <created>1729759427240</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1729759427240</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Other">
+      <option name="closed" value="true" />
+      <created>1729759458240</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1729759458240</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -318,9 +350,13 @@
     <MESSAGE value="ferst worked version" />
     <MESSAGE value="Add db revisions" />
     <MESSAGE value="delete debug prints" />
-    <option name="LAST_COMMIT_MESSAGE" value="delete debug prints" />
+    <MESSAGE value="Add Pydantic models for input Dish and Menu" />
+    <MESSAGE value="Add @classmetod delete" />
+    <MESSAGE value="Changes for Pyndantic models" />
+    <MESSAGE value="Other" />
+    <option name="LAST_COMMIT_MESSAGE" value="Other" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/food_monitoring$main.coverage" NAME="main Coverage Results" MODIFIED="1729759207892" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="E:\Documents\myProjects\food_monitoring\app" />
+    <SUITE FILE_PATH="coverage/food_monitoring$main.coverage" NAME="main Coverage Results" MODIFIED="1730021962108" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="E:\Documents\myProjects\food_monitoring\app" />
   </component>
 </project>

@@ -43,6 +43,9 @@ class DishPydantic(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+class DishPydanticEdit(BaseModel):
+    id: int
+
 class MenuPydantic(BaseModel):
     date_menu: date
     type_menu: str
@@ -51,12 +54,15 @@ class MenuPydantic(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+class MenuPydanticEdit(BaseModel):
+    id: int
+
 @connection
 async def get_menus(session):
     row = await MenuCRUD.get_all(session)
     if row:
         return row
-    return {'message': 'Меню не найдено!'}
+    return None
 
 @connection
 async def get_menus_by_day(session, date_menu: date):
@@ -85,6 +91,13 @@ async def get_dish_by_id(session, dish_id: int):
         return DishPydantic.from_orm(row).dict()
     return {'message': f'Блюдо с ID {dish_id} не найдено!'}
 
+@connection
+async def delete_dish_by_id(session, dish_id: int):
+    return await DishCRUD.delete(session, dish_id)
+
+@connection
+async def delete_menu_by_id(session, menu_id: int):
+    return await MenuCRUD.delete(session, menu_id)
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
@@ -99,7 +112,7 @@ async def nutritions(request: Request):
     row = await get_menus()
     if row:
         for _ in row:
-            cur_menu = _.date_menu.isoformat()
+            cur_menu = str(_.date_menu)
             if cur_menu not in menu_list:
                 menu_list.append(cur_menu)
     menu_list.sort()
@@ -129,8 +142,6 @@ async def menu_in_date(menu: str, request: Request):
                     'price': dish['price'],
                 })
 
-
-
     return templates.TemplateResponse(request=request, name='menu_today.html',
                                       context={'title': title, 'menu': menu_today})
 
@@ -153,6 +164,33 @@ async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()]):
     redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
+@app.post('/del_dish/')
+async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()]):
+    try:
+        await delete_dish_by_id(dish_id=data.id)
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully deleted!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+@app.post('/del_menu/')
+async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()]):
+    try:
+        await delete_menu_by_id(menu_id=data.id)
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully deleted!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+@app.post('/edit_dish/')
+async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()]):
+    dish = await get_dish_by_id(dish_id=data.id)
+    try:
+        pass
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully edit!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get('/admin-tehnolog/', response_class=HTMLResponse)
 async def admin_nutritions(request: Request):
@@ -176,27 +214,30 @@ async def admin_nutritions(request: Request):
 
     menus = {}
     menus_db = await get_menus()
-    for _ in menus_db:
-        date = _.date_menu.isoformat()
-        if date not in menus:
-            menus[date] = {}
-        if _.category_menu not in menus[date]:
-            menus[date][_.category_menu] = {}
-        if _.type_menu not in menus[date][_.category_menu]:
-            menus[date][_.category_menu][_.type_menu] = []
-        dish = await get_dish_by_id(dish_id=_.dish_id)
+    if menus_db:
+        for _ in menus_db:
+            date = _.date_menu.isoformat()
+            if date not in menus:
+                menus[date] = {}
+            if _.category_menu not in menus[date]:
+                menus[date][_.category_menu] = {}
+            if _.type_menu not in menus[date][_.category_menu]:
+                menus[date][_.category_menu][_.type_menu] = []
+            dish = await get_dish_by_id(dish_id=_.dish_id)
 
-        menus[date][_.category_menu][_.type_menu].append({
-            'dish_id': dish['id'],
-            'dish_title': dish['title'],
-            'dish_out': dish['out_gramm'],
-            'dish_recipe': dish['recipe'],
-            'dish_calories': dish['calories'],
-            'dish_protein': dish['protein'],
-            'dish_fats': dish['fats'],
-            'dish_carb': dish['carb'],
-            'dish_price': dish['price']
-        })
+            menus[date][_.category_menu][_.type_menu].append({
+                'menu_id': _.id,
+                'dish_id': dish['id'],
+                'dish_title': dish['title'],
+                'dish_out': dish['out_gramm'],
+                'dish_recipe': dish['recipe'],
+                'dish_calories': dish['calories'],
+                'dish_protein': dish['protein'],
+                'dish_fats': dish['fats'],
+                'dish_carb': dish['carb'],
+                'dish_price': dish['price']
+            })
+
 
     return templates.TemplateResponse(request=request, name='admin_nutritions.html',
                                       context={'title': title, 'dishes': dishes, 'menus': menus})
