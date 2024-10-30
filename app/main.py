@@ -10,8 +10,10 @@ from pydantic import BaseModel, ConfigDict
 from starlette import status
 from starlette.responses import RedirectResponse
 
+
 from crud.crud import MenuCRUD, DishCRUD
 from models.db import connection
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -196,6 +198,7 @@ async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()])
 
 @app.get('/admin-tehnolog/', response_class=HTMLResponse)
 async def admin_nutritions(request: Request):
+
     title = 'Панель управления технолога'
     dishes = {}
     dishes_db = await get_dishes()
@@ -243,3 +246,15 @@ async def admin_nutritions(request: Request):
 
     return templates.TemplateResponse(request=request, name='admin_nutritions.html',
                                       context={'title': title, 'dishes': dishes, 'menus': menus})
+
+
+@app.post('/logout')
+async def logout_user(request: Request):
+    redirect_url = request.url_for('login').include_query_params(msg="Logout!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get('/login')
+async def login(request: Request):
+    title = 'Авторизация'
+
+    return templates.TemplateResponse(request=request, name='login.html', context={'title': title})
