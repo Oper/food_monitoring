@@ -1,8 +1,8 @@
-"""Refact Tables2
+"""New rev
 
-Revision ID: 9a47abc8b9a2
-Revises: 7558e0f5de43
-Create Date: 2024-10-22 12:54:14.279406
+Revision ID: a84f4f6b92e3
+Revises: 
+Create Date: 2024-10-30 17:00:24.242434
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9a47abc8b9a2'
-down_revision: Union[str, None] = '7558e0f5de43'
+revision: str = 'a84f4f6b92e3'
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

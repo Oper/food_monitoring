@@ -4,7 +4,7 @@ from sqlalchemy import func, ForeignKey
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from db import Base
+from app.db import Base
 
 
 class Dish(Base):
