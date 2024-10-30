@@ -10,6 +10,8 @@ from models.models import User, Dish, Menu
 class UserCRUD(BaseCRUD):
     model = User
 
+
+
 class DishCRUD(BaseCRUD):
     model = Dish
 
