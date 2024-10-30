@@ -9,6 +9,9 @@ DB_NAME = os.environ.get('DB_NAME')
 DB_USER = os.environ.get('DB_USER')
 DB_PASS = os.environ.get('DB_PASS')
 
+SECRET_KEY = os.environ.get('SECRET_KEY')
+ALGORITHM = os.environ.get('ALGORITHM')
+
 def get_link_db(driver: str) -> str:
     """
     using your DB
