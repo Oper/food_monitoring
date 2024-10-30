@@ -1,16 +1,11 @@
 from datetime import date
 
-from sqlalchemy import  func, ForeignKey
+from sqlalchemy import func, ForeignKey, String, Boolean
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.db import Base
 
-
-class User(Base):
-    __tablename__ = 'users'
-
-    login: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str] = mapped_column(unique=True)
 
 class Dish(Base):
     __tablename__ = 'dishes'
@@ -41,3 +36,4 @@ class Menu(Base):
         'Dish',
         back_populates='menus'
     )
+
