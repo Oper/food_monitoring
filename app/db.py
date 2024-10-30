@@ -1,8 +1,12 @@
+from contextlib import asynccontextmanager
 from datetime import datetime
+from typing import AsyncGenerator
 
+from fastapi import Depends
 from sqlalchemy import Integer, func
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs, AsyncSession
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, declared_attr, class_mapper
+from loguru import logger
 
 from app import config
 
@@ -30,14 +34,24 @@ class Base(AsyncAttrs, DeclarativeBase):
         return cls.__name__.lower() + 's'
 
 
-def connection(method):
-    async def wrapper(*args, **kwargs):
-        async with async_session_maker() as session:
-            try:
-                return await method(*args, session=session, **kwargs)
-            except Exception as e:
-                await session.rollback()
-                raise e
-            finally:
-                await session.close()
-    return wrapper
+@asynccontextmanager
+async def managed_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            logger.exception(f"Database session error: {str(e)}")
+            raise
+        finally:
+            await session.close()
+
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with managed_session() as session:
+        yield session
+
+
+# Dependency для использования в маршрутах FastAPI
+SessionDep = Depends(get_session)

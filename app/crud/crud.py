@@ -1,15 +1,53 @@
 from datetime import timedelta, date
 
+from loguru import logger
+from pydantic import BaseModel
 from sqlalchemy import select, and_
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.base import BaseCRUD
-from models.models import User, Dish, Menu
+from auth.models import User
+from models.models import Dish, Menu
 
 
 class UserCRUD(BaseCRUD):
     model = User
 
+    @classmethod
+    async def find_one_or_none_by_id(cls, data_id: int, session: AsyncSession):
+        # Найти запись по ID
+        logger.info(f"Поиск {cls.model.__name__} с ID: {data_id}")
+        try:
+            query = select(cls.model).filter_by(id=data_id)
+            result = await session.execute(query)
+            record = result.scalar_one_or_none()
+            if record:
+                logger.info(f"Запись с ID {data_id} найдена.")
+            else:
+                logger.info(f"Запись с ID {data_id} не найдена.")
+            return record
+        except SQLAlchemyError as e:
+            logger.error(f"Ошибка при поиске записи с ID {data_id}: {e}")
+            raise
+
+    @classmethod
+    async def find_one_or_none(cls, session: AsyncSession, filters: BaseModel):
+        # Найти одну запись по фильтрам
+        filter_dict = filters.model_dump(exclude_unset=True)
+        logger.info(f"Поиск одной записи {cls.model.__name__} по фильтрам: {filter_dict}")
+        try:
+            query = select(cls.model).filter_by(**filter_dict)
+            result = await session.execute(query)
+            record = result.scalar_one_or_none()
+            if record:
+                logger.info(f"Запись найдена по фильтрам: {filter_dict}")
+            else:
+                logger.info(f"Запись не найдена по фильтрам: {filter_dict}")
+            return record
+        except SQLAlchemyError as e:
+            logger.error(f"Ошибка при поиске записи по фильтрам {filter_dict}: {e}")
+            raise
 
 
 class DishCRUD(BaseCRUD):

@@ -1,10 +1,10 @@
 from datetime import date
 
-from sqlalchemy import func, ForeignKey, String, Boolean
+from sqlalchemy import func, ForeignKey
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.db import Base
+from db import Base
 
 
 class Dish(Base):

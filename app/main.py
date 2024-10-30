@@ -7,13 +7,13 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import RedirectResponse
 
 
 from crud.crud import MenuCRUD, DishCRUD
-from models.db import connection
-
+from db import SessionDep
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -59,49 +59,6 @@ class MenuPydantic(BaseModel):
 class MenuPydanticEdit(BaseModel):
     id: int
 
-@connection
-async def get_menus(session):
-    row = await MenuCRUD.get_all(session)
-    if row:
-        return row
-    return None
-
-@connection
-async def get_menus_by_day(session, date_menu: date):
-    row = await MenuCRUD.get_all_menus_by_one_day(session, date_menu)
-    if row:
-        return row
-    return {'message': 'Меню не найдено!'}
-
-@connection
-async def get_dishes(session):
-    row = await DishCRUD.get_all(session)
-    if row:
-        return row
-    return None
-
-@connection
-async def add_dish(session, **kwargs):
-    return await DishCRUD.add(session, **kwargs)
-
-@connection
-async def add_menu(session, **kwargs):
-    return await MenuCRUD.add(session, **kwargs)
-
-@connection
-async def get_dish_by_id(session, dish_id: int):
-    row = await DishCRUD.get_dish_by_id(session, dish_id)
-    if row:
-        return DishPydantic.from_orm(row).dict()
-    return {'message': f'Блюдо с ID {dish_id} не найдено!'}
-
-@connection
-async def delete_dish_by_id(session, dish_id: int):
-    return await DishCRUD.delete(session, dish_id)
-
-@connection
-async def delete_menu_by_id(session, menu_id: int):
-    return await MenuCRUD.delete(session, menu_id)
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
@@ -109,11 +66,11 @@ async def main(request: Request):
 
 
 @app.get('/nutritions/', response_class=HTMLResponse)
-async def nutritions(request: Request):
+async def nutritions(request: Request, session: AsyncSession = SessionDep):
     title = 'Питание МБОУ "СОШ№1" г.Емвы'
     menu_list = []
     current_date = date.today().isoformat()
-    row = await get_menus()
+    row = await MenuCRUD.get_all(session=session)
     if row:
         for _ in row:
             cur_menu = str(_.date_menu)
@@ -126,10 +83,10 @@ async def nutritions(request: Request):
 
 
 @app.get('/nutritions/{menu}', response_class=HTMLResponse)
-async def menu_in_date(menu: str, request: Request):
+async def menu_in_date(menu: str, request: Request, session: AsyncSession = SessionDep):
     title = 'Меню на ' + str(menu)
     current_menu = datetime.strptime(menu, "%Y-%m-%d").date()
-    menus_db_by_day = await get_menus_by_day(date_menu=current_menu)
+    menus_db_by_day = await MenuCRUD.get_all_menus_by_one_day(session=session, day=current_menu)
     menu_today = {}
     if menus_db_by_day:
         for _ in menus_db_by_day:
@@ -137,13 +94,13 @@ async def menu_in_date(menu: str, request: Request):
                 menu_today[_.category_menu] = {}
             if _.type_menu not in menu_today[_.category_menu]:
                 menu_today[_.category_menu][_.type_menu] = []
-            dish = await get_dish_by_id(dish_id=_.dish_id)
+            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=_.dish_id)
             if dish:
                 menu_today[_.category_menu][_.type_menu].append({
-                    'dish_name': dish['title'],
-                    'out_gramm': dish['out_gramm'],
-                    'calories': dish['calories'],
-                    'price': dish['price'],
+                    'dish_name': dish.title,
+                    'out_gramm': dish.out_gramm,
+                    'calories': dish.calories,
+                    'price': dish.price,
                 })
 
     return templates.TemplateResponse(request=request, name='menu_today.html',
@@ -151,45 +108,45 @@ async def menu_in_date(menu: str, request: Request):
 
 
 @app.post('/send_dish/')
-async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()]):
+async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()], session: AsyncSession = SessionDep):
     try:
-        new_dish = await add_dish(title=data.title, recipe=data.recipe, out_gramm=data.out_gramm, price=data.price, calories=data.calories, protein=data.protein, fats=data.fats, carb=data.carb)
+        new_dish = await DishCRUD.add(session=session, title=data.title, recipe=data.recipe, out_gramm=data.out_gramm, price=data.price, calories=data.calories, protein=data.protein, fats=data.fats, carb=data.carb)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/send_menu/')
-async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()]):
+async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()], session: AsyncSession = SessionDep):
     try:
-        new_menu = await add_menu(date_menu=data.date_menu, type_menu=data.type_menu, category_menu=data.category_menu, dish_id=data.dish_id)
+        new_menu = await MenuCRUD.add(session=session, date_menu=data.date_menu, type_menu=data.type_menu, category_menu=data.category_menu, dish_id=data.dish_id)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/del_dish/')
-async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()]):
+async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()], session: AsyncSession = SessionDep):
     try:
-        await delete_dish_by_id(dish_id=data.id)
+        await DishCRUD.delete(session=session, id=data.id)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/del_menu/')
-async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()]):
+async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()], session: AsyncSession = SessionDep):
     try:
-        await delete_menu_by_id(menu_id=data.id)
+        await MenuCRUD.delete(session=session, id=data.id)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/edit_dish/')
-async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()]):
-    dish = await get_dish_by_id(dish_id=data.id)
-    try:
+async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()], session: AsyncSession = SessionDep):
+    dish = await DishCRUD.get_dish_by_id(session=session, dish_id=data.id)
+    try: #TODO
         pass
     except Exception as e:
         logger.error(e)
@@ -197,11 +154,11 @@ async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()])
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get('/admin-tehnolog/', response_class=HTMLResponse)
-async def admin_nutritions(request: Request):
+async def admin_nutritions(request: Request, session: AsyncSession = SessionDep):
 
     title = 'Панель управления технолога'
     dishes = {}
-    dishes_db = await get_dishes()
+    dishes_db = await DishCRUD.get_all(session=session)
     for row in dishes_db:
         dish = row.to_dict()
         if dish['title'] not in dishes:
@@ -218,7 +175,7 @@ async def admin_nutritions(request: Request):
         })
 
     menus = {}
-    menus_db = await get_menus()
+    menus_db = await MenuCRUD.get_all(session=session)
     if menus_db:
         for _ in menus_db:
             date = _.date_menu.isoformat()
@@ -228,19 +185,19 @@ async def admin_nutritions(request: Request):
                 menus[date][_.category_menu] = {}
             if _.type_menu not in menus[date][_.category_menu]:
                 menus[date][_.category_menu][_.type_menu] = []
-            dish = await get_dish_by_id(dish_id=_.dish_id)
+            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=_.dish_id)
 
             menus[date][_.category_menu][_.type_menu].append({
                 'menu_id': _.id,
-                'dish_id': dish['id'],
-                'dish_title': dish['title'],
-                'dish_out': dish['out_gramm'],
-                'dish_recipe': dish['recipe'],
-                'dish_calories': dish['calories'],
-                'dish_protein': dish['protein'],
-                'dish_fats': dish['fats'],
-                'dish_carb': dish['carb'],
-                'dish_price': dish['price']
+                'dish_id': dish.id,
+                'dish_title': dish.title,
+                'dish_out': dish.out_gramm,
+                'dish_recipe': dish.recipe,
+                'dish_calories': dish.calories,
+                'dish_protein': dish.protein,
+                'dish_fats': dish.fats,
+                'dish_carb': dish.carb,
+                'dish_price': dish.price,
             })
 
 
