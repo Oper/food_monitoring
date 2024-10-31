@@ -13,18 +13,40 @@
     <div class="row align-items-center">
         <div class="col"></div>
         <div class="col">
-            <form method="post" action="/auth/login" id="loginForm">
+            <form method="post" action="/auth/register/" id="registerForm">
                 <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Емаил</label>
+                    <label for="exampleInputEmail1" class="form-label">Email address</label>
                     <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
                            name="email">
-                    <div id="emailHelp" class="form-text">Введите Ваш емаил адрес</div>
+                    <div id="emailHelp" class="form-text">Электронная почта</div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputPhone" class="form-label">Phone number</label>
+                    <input type="text" class="form-control" id="exampleInputPhone" aria-describedby="phoneHelp"
+                           name="phone_number">
+                    <div id="phoneHelp" class="form-text">Номер телефона</div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputFirstName" class="form-label">Имя</label>
+                    <input type="text" class="form-control" id="exampleInputFirstName" aria-describedby="first_nameHelp"
+                           name="first_name">
+                    <div id="first_nameHelp" class="form-text">Ваше имя</div>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputLastName" class="form-label">Фамилия</label>
+                    <input type="text" class="form-control" id="exampleInputLastName" aria-describedby="last_nameHelp"
+                           name="last_name">
+                    <div id="last_nameHelp" class="form-text">Ваша фамилия</div>
                 </div>
                 <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Пароль</label>
                     <input type="password" class="form-control" id="exampleInputPassword1" name="password">
                 </div>
-                <button type="submit" class="btn btn-primary">Войти</button>
+                <div class="mb-3">
+                    <label for="exampleInputPassword2" class="form-label">Подтвердите пароль</label>
+                    <input type="password" class="form-control" id="exampleInputPassword2" name="confirm_password">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
         <div class="col"></div>
@@ -34,7 +56,7 @@
 
 </body>
 <script>
-    document.getElementById('loginForm').addEventListener('submit', submitForm);
+    document.getElementById('registerForm').addEventListener('submit', submitForm);
 
     function submitForm(event) {
         // Отменяем стандартное поведение браузера с отправкой формы
@@ -60,7 +82,7 @@
         fetch(request).then(
             function (response) {
                 // Запрос успешно выполнен
-                window.location.href = 'admin-tehnolog';
+                window.location.href = 'nutritions';
                 console.log(response);
                 // return response.json() и так далее см. документацию
             },

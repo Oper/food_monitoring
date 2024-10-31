@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Annotated
 
 from fastapi import Depends
 from sqlalchemy import Integer, func
@@ -16,7 +16,7 @@ DATABASE_URL = config.get_link_db('postgresql+asyncpg')
 engine = create_async_engine(url=DATABASE_URL)
 
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
+str_uniq = Annotated[str, mapped_column(unique=True, nullable=False)]
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True

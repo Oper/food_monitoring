@@ -2,17 +2,20 @@ from datetime import date, datetime
 from typing import Annotated
 from venv import logger
 
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import RedirectResponse
 
 
+from auth.dependencies import get_current_user
+from auth.models import User
 from crud.crud import MenuCRUD, DishCRUD
+from auth.router import router as router_auth
 from db import SessionDep
 
 app = FastAPI()
@@ -32,16 +35,8 @@ class DishPydanticIn(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
-class DishPydantic(BaseModel):
+class DishPydantic(DishPydanticIn):
     id: int
-    title: str
-    recipe: int
-    out_gramm: int
-    price: float
-    calories: float
-    protein: float
-    fats: float
-    carb: float
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
@@ -150,12 +145,12 @@ async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()],
         pass
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully edit!")
-    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    # redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully edit!")
+    # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    return app.url_path_for('admin:tehnolog')
 
-@app.get('/admin-tehnolog/', response_class=HTMLResponse)
-async def admin_nutritions(request: Request, session: AsyncSession = SessionDep):
-
+@app.get('/admin-tehnolog/', name='admin:tehnolog', response_class=HTMLResponse)
+async def admin_nutritions(request: Request, user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     title = 'Панель управления технолога'
     dishes = {}
     dishes_db = await DishCRUD.get_all(session=session)
@@ -205,13 +200,19 @@ async def admin_nutritions(request: Request, session: AsyncSession = SessionDep)
                                       context={'title': title, 'dishes': dishes, 'menus': menus})
 
 
-@app.post('/logout')
-async def logout_user(request: Request):
-    redirect_url = request.url_for('login').include_query_params(msg="Logout!")
-    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
-
 @app.get('/login')
 async def login(request: Request):
     title = 'Авторизация'
-
     return templates.TemplateResponse(request=request, name='login.html', context={'title': title})
+
+@app.get('/register')
+async def register(request: Request):
+    title = 'Регистрация'
+    return templates.TemplateResponse(request=request, name='register.html', context={'title': title})
+
+app.include_router(router_auth)
+
+@app.get('/404')
+async def not_found(request: Request):
+    title = 'Страница не найдена'
+    return templates.TemplateResponse(request=request, name='404.html', context={'title': title})

@@ -1,3 +1,4 @@
+from fastapi import Depends
 from pydantic import EmailStr
 from jose import jwt
 from datetime import datetime, timedelta, timezone

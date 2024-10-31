@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import config
 from app.db import SessionDep
-from app.exceptions import TokenExpiredException, NoJwtException, NoUserIdException, ForbiddenException, TokenNoFound
+from app.exceptions import TokenExpiredException, NoJwtException, NoUserIdException, TokenNoFound
 from app.crud.crud import UserCRUD
 
 

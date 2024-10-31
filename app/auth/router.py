@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, Depends
+from fastapi import APIRouter, Response
 
 from app.db import SessionDep
 from app.exceptions import UserAlreadyExistsException, IncorrectEmailOrPasswordException

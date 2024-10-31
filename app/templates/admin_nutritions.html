@@ -11,9 +11,17 @@
 <body>
 <div class="container-md">
     <ul class="nav justify-content-end">
-        <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
-        <li class="nav-item"><a href="../nutritions" class="nav-link px-2 text-body-secondary">Список меню</a></li>
-        <li class="nav-item"><a href="../logout" class="nav-link px-2 text-body-secondary">Выход</a></li>
+        <li class="nav-item">
+            <a type="submit" href="../" class="nav-link px-2 text-body-secondary">Главная</a>
+        </li>
+        <li class="nav-item">
+            <a href="../nutritions" class="nav-link px-2 text-body-secondary">Список меню</a>
+        </li>
+        <li class="nav-item">
+            <form action="/auth/logout/" method="post">
+                <button type="submit" class="nav-link px-2 text-body-secondary">Выход</button>
+            </form>
+        </li>
     </ul>
     <h3 class="text-center">{{ title }}</h3>
     <div class="row">
