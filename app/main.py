@@ -32,6 +32,7 @@ class DishPydanticIn(BaseModel):
     protein: float
     fats: float
     carb: float
+    section: str
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
@@ -105,10 +106,10 @@ async def menu_in_date(menu: str, request: Request, session: AsyncSession = Sess
 @app.post('/send_dish/')
 async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()], session: AsyncSession = SessionDep):
     try:
-        new_dish = await DishCRUD.add(session=session, title=data.title, recipe=data.recipe, out_gramm=data.out_gramm, price=data.price, calories=data.calories, protein=data.protein, fats=data.fats, carb=data.carb)
+        new_dish = await DishCRUD.add(session=session, title=data.title, recipe=data.recipe, out_gramm=data.out_gramm, price=data.price, calories=data.calories, protein=data.protein, fats=data.fats, carb=data.carb, section=data.section)
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully created!")
+    redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/send_menu/')
@@ -117,7 +118,7 @@ async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()], s
         new_menu = await MenuCRUD.add(session=session, date_menu=data.date_menu, type_menu=data.type_menu, category_menu=data.category_menu, dish_id=data.dish_id)
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully created!")
+    redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/del_dish/')
@@ -126,7 +127,7 @@ async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()
         await DishCRUD.delete(session=session, id=data.id)
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully deleted!")
+    redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/del_menu/')
@@ -135,7 +136,7 @@ async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()
         await MenuCRUD.delete(session=session, id=data.id)
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully deleted!")
+    redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post('/edit_dish/')
