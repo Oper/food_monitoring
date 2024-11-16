@@ -23,6 +23,7 @@ class Dish(Base):
         back_populates='dish',
         cascade='all, delete-orphan'
     )
+    section: Mapped[str] = mapped_column(nullable=True)
 
 
 class Menu(Base):
