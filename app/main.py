@@ -73,10 +73,9 @@ async def nutritions(request: Request, session: AsyncSession = SessionDep):
                 cur_menu = str(_.date_menu)
                 if cur_menu not in menu_list:
                     menu_list.append(cur_menu)
-    except:
-        print('menus no')
-
-    menu_list.sort()
+        menu_list.sort()
+    except Exception as e:
+        logger.error(e)
 
     return templates.TemplateResponse(request=request, name='nutritions.html',
                                       context={'title': title, 'date_todey': current_date, 'menu_list': menu_list})
