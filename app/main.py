@@ -66,12 +66,16 @@ async def nutritions(request: Request, session: AsyncSession = SessionDep):
     title = 'Питание МБОУ "СОШ№1" г.Емвы'
     menu_list = []
     current_date = date.today().isoformat()
-    row = await MenuCRUD.get_all(session=session)
-    if row:
-        for _ in row:
-            cur_menu = str(_.date_menu)
-            if cur_menu not in menu_list:
-                menu_list.append(cur_menu)
+    try:
+        row = await MenuCRUD.get_all(session=session)
+        if row:
+            for _ in row:
+                cur_menu = str(_.date_menu)
+                if cur_menu not in menu_list:
+                    menu_list.append(cur_menu)
+    except:
+        print('menus no')
+
     menu_list.sort()
 
     return templates.TemplateResponse(request=request, name='nutritions.html',
