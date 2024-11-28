@@ -6,9 +6,9 @@ from sqlalchemy import select, and_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud.base import BaseCRUD
-from auth.models import User
-from models.models import Dish, Menu
+from app.crud.base import BaseCRUD
+from app.auth.models import User
+from app.models.models import Dish, Menu
 
 
 class UserCRUD(BaseCRUD):

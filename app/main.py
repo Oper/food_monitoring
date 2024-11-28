@@ -12,11 +12,11 @@ from starlette import status
 from starlette.responses import RedirectResponse
 
 
-from auth.dependencies import get_current_user
-from auth.models import User
-from crud.crud import MenuCRUD, DishCRUD
-from auth.router import router as router_auth
-from db import SessionDep
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+from app.crud.crud import MenuCRUD, DishCRUD
+from app.auth.router import router as router_auth
+from app.db import SessionDep
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")

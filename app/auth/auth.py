@@ -4,7 +4,7 @@ from jose import jwt
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import config
+import app.config as config
 from app.auth.schemas import EmailModel
 from app.auth.utils import verify_password
 from app.crud.crud import UserCRUD
