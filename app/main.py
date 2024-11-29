@@ -17,6 +17,7 @@ from app.auth.models import User
 from app.crud.crud import MenuCRUD, DishCRUD
 from app.auth.router import router as router_auth
 from app.db import SessionDep
+from app.exceptions import TokenExpiredException
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -206,6 +207,11 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
 
 @app.get('/login')
 async def login(request: Request):
+    title = 'Авторизация'
+    return templates.TemplateResponse(request=request, name='login.html', context={'title': title})
+
+@app.exception_handler(TokenExpiredException)
+async def login_exception(request: Request):
     title = 'Авторизация'
     return templates.TemplateResponse(request=request, name='login.html', context={'title': title})
 
