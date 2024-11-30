@@ -6,18 +6,17 @@ from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from openpyxl import load_workbook
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from starlette.responses import RedirectResponse
-
+from starlette.responses import RedirectResponse, FileResponse
 
 from app.auth.dependencies import get_current_user
 from app.auth.models import User
 from app.crud.crud import MenuCRUD, DishCRUD
 from app.auth.router import router as router_auth
 from app.db import SessionDep
-from app.exceptions import TokenExpiredException
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -221,3 +220,15 @@ app.include_router(router_auth)
 async def not_found(request: Request):
     title = 'Страница не найдена'
     return templates.TemplateResponse(request=request, name='404.html', context={'title': title})
+
+@app.get('/download/{menu}')
+async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = SessionDep):
+    wb = load_workbook(filename='GGGG-MM-DD-sm.xlsx')
+    wb.template = True
+    current_date_menu = datetime.strptime(menu, "%Y-%m-%d").date()
+    result_filename = menu + '-sm.xlsx'
+    #menus_db_by_day = await MenuCRUD.get_category_menus_one_day(session=session, day=current_date_menu)
+    sheet = wb['1']
+    sheet['D4'] = 'testing'
+    wb.save(filename=result_filename)
+    return FileResponse(path=result_filename, filename=result_filename, media_type='multipart/form-data')

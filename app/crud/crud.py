@@ -91,3 +91,9 @@ class MenuCRUD(BaseCRUD):
         query = select(cls.model).filter(cls.model.date_menu == day)
         result = await session.execute(query)
         return result.scalars().all()
+
+    @classmethod
+    async def get_category_menus_one_day(cls, session: AsyncSession, day: date):
+        query = select(cls.model).filter(and_(cls.model.category_menu == '1-4 классы', cls.model.date_menu == day))
+        result = await session.execute(query)
+        return result.scalars().all()
