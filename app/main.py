@@ -224,11 +224,21 @@ async def not_found(request: Request):
 @app.get('/download/{menu}')
 async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = SessionDep):
     wb = load_workbook(filename='GGGG-MM-DD-sm.xlsx')
-    wb.template = True
-    current_date_menu = datetime.strptime(menu, "%Y-%m-%d").date()
-    result_filename = menu + '-sm.xlsx'
-    #menus_db_by_day = await MenuCRUD.get_category_menus_one_day(session=session, day=current_date_menu)
     sheet = wb['1']
-    sheet['D4'] = 'testing'
-    wb.save(filename=result_filename)
+    current_date_menu = datetime.strptime(menu, "%Y-%m-%d").date()
+    sheet['J1'] = current_date_menu
+    result_filename = menu + '-sm.xlsx'
+    menus_db_by_day = await MenuCRUD.get_category_menus_one_day(session=session, day=current_date_menu)
+    if menus_db_by_day:
+        for row in menus_db_by_day:
+            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=row.dish_id)
+            if row.type_menu == 'Завтрак' and dish.section == 'Хлеб':
+                sheet['D6'] = dish.title
+                sheet['E6'] = dish.out_gramm
+                sheet['F6'] = dish.price
+                sheet['G6'] = dish.calories
+                sheet['H6'] = dish.protein
+                sheet['I6'] = dish.fats
+                sheet['J6'] = dish.carb
+    wb.save(result_filename)
     return FileResponse(path=result_filename, filename=result_filename, media_type='multipart/form-data')
