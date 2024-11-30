@@ -81,7 +81,7 @@ class MenuCRUD(BaseCRUD):
     async def get_all(cls, session: AsyncSession):
         current_date = date.today()
         left_date = current_date - timedelta(days=1)
-        right_date = current_date + timedelta(days=1)
+        right_date = current_date + timedelta(days=3)
         query = select(cls.model).filter(and_(cls.model.date_menu >= left_date, cls.model.date_menu <= right_date))
         result = await session.execute(query)
         return result.scalars().all()
