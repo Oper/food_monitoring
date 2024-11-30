@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from openpyxl import load_workbook
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import RedirectResponse, FileResponse
@@ -234,7 +234,8 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
             dish = await DishCRUD.get_dish_by_id(session=session, dish_id=row.dish_id)
             if row.type_menu == 'Завтрак':
                 if dish.section == 'гор.блюдо':
-                    sheet['C4'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C4'] = dish.recipe
                     sheet['D4'] = dish.title
                     sheet['E4'] = dish.out_gramm
                     sheet['F4'] = dish.price
@@ -243,7 +244,8 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['I4'] = dish.fats
                     sheet['J4'] = dish.carb
                 elif dish.section == 'гор.напиток':
-                    sheet['C5'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C5'] = dish.recipe
                     sheet['D5'] = dish.title
                     sheet['E5'] = dish.out_gramm
                     sheet['F5'] = dish.price
@@ -252,7 +254,6 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['I5'] = dish.fats
                     sheet['J5'] = dish.carb
                 elif dish.section == 'Хлеб':
-                    sheet['C6'] = dish.recipe
                     sheet['D6'] = dish.title
                     sheet['E6'] = dish.out_gramm
                     sheet['F6'] = dish.price
@@ -261,7 +262,8 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['I6'] = dish.fats
                     sheet['J6'] = dish.carb
                 elif dish.section == 'Нет' and not sheet['D7'].value:
-                    sheet['C7'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C7'] = dish.recipe
                     sheet['D7'] = dish.title
                     sheet['E7'] = dish.out_gramm
                     sheet['F7'] = dish.price
@@ -270,7 +272,8 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['I7'] = dish.fats
                     sheet['J7'] = dish.carb
                 else:
-                    sheet['C8'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C8'] = dish.recipe
                     sheet['D8'] = dish.title
                     sheet['E8'] = dish.out_gramm
                     sheet['F8'] = dish.price
@@ -280,91 +283,87 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['J8'] = dish.carb
             elif row.type_menu == 'Обед':
                 if dish.section == 'фрукты':
-                    sheet['C9'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C9'] = dish.recipe
                     sheet['D9'] = dish.title
                     sheet['E9'] = dish.out_gramm
-                    sheet['F9'] = dish.price
                     sheet['G9'] = dish.calories
                     sheet['H9'] = dish.protein
                     sheet['I9'] = dish.fats
                     sheet['J9'] = dish.carb
                 elif dish.section == 'закуска':
-                    sheet['C12'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C12'] = dish.recipe
                     sheet['D12'] = dish.title
                     sheet['E12'] = dish.out_gramm
-                    sheet['F12'] = dish.price
                     sheet['G12'] = dish.calories
                     sheet['H12'] = dish.protein
                     sheet['I12'] = dish.fats
                     sheet['J12'] = dish.carb
                 elif dish.section == '1 блюдо':
-                    sheet['C13'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C13'] = dish.recipe
                     sheet['D13'] = dish.title
                     sheet['E13'] = dish.out_gramm
-                    sheet['F13'] = dish.price
                     sheet['G13'] = dish.calories
                     sheet['H13'] = dish.protein
                     sheet['I13'] = dish.fats
                     sheet['J13'] = dish.carb
                 elif dish.section == '2 блюдо':
-                    sheet['C14'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C14'] = dish.recipe
                     sheet['D14'] = dish.title
                     sheet['E14'] = dish.out_gramm
-                    sheet['F14'] = dish.price
                     sheet['G14'] = dish.calories
                     sheet['H14'] = dish.protein
                     sheet['I14'] = dish.fats
                     sheet['J14'] = dish.carb
                 elif dish.section == 'гарнир':
-                    sheet['C15'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C15'] = dish.recipe
                     sheet['D15'] = dish.title
                     sheet['E15'] = dish.out_gramm
-                    sheet['F15'] = dish.price
                     sheet['G15'] = dish.calories
                     sheet['H15'] = dish.protein
                     sheet['I15'] = dish.fats
                     sheet['J15'] = dish.carb
                 elif dish.section == 'сладкое':
-                    sheet['C16'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C16'] = dish.recipe
                     sheet['D16'] = dish.title
                     sheet['E16'] = dish.out_gramm
-                    sheet['F16'] = dish.price
                     sheet['G16'] = dish.calories
                     sheet['H16'] = dish.protein
                     sheet['I16'] = dish.fats
                     sheet['J16'] = dish.carb
                 elif dish.section == 'хлеб бел.':
-                    sheet['C17'] = dish.recipe
                     sheet['D17'] = dish.title
                     sheet['E17'] = dish.out_gramm
-                    sheet['F17'] = dish.price
                     sheet['G17'] = dish.calories
                     sheet['H17'] = dish.protein
                     sheet['I17'] = dish.fats
                     sheet['J17'] = dish.carb
                 elif dish.section == 'хлеб черн.':
-                    sheet['C18'] = dish.recipe
                     sheet['D18'] = dish.title
                     sheet['E18'] = dish.out_gramm
-                    sheet['F18'] = dish.price
                     sheet['G18'] = dish.calories
                     sheet['H18'] = dish.protein
                     sheet['I18'] = dish.fats
                     sheet['J18'] = dish.carb
                 elif dish.section == 'Нет' and not sheet['D19'].value:
-                    sheet['C19'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C19'] = dish.recipe
                     sheet['D19'] = dish.title
                     sheet['E19'] = dish.out_gramm
-                    sheet['F19'] = dish.price
                     sheet['G19'] = dish.calories
                     sheet['H19'] = dish.protein
                     sheet['I19'] = dish.fats
                     sheet['J19'] = dish.carb
                 else:
-                    sheet['C20'] = dish.recipe
+                    if dish.recipe != 0:
+                        sheet['C20'] = dish.recipe
                     sheet['D20'] = dish.title
                     sheet['E20'] = dish.out_gramm
-                    sheet['F20'] = dish.price
                     sheet['G20'] = dish.calories
                     sheet['H20'] = dish.protein
                     sheet['I20'] = dish.fats
