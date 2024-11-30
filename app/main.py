@@ -210,11 +210,6 @@ async def login(request: Request):
     title = 'Авторизация'
     return templates.TemplateResponse(request=request, name='login.html', context={'title': title})
 
-@app.exception_handler(TokenExpiredException)
-async def login_exception(request: Request):
-    title = 'Авторизация'
-    return templates.TemplateResponse(request=request, name='login.html', context={'title': title})
-
 @app.get('/register')
 async def register(request: Request):
     title = 'Регистрация'
