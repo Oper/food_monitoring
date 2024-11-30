@@ -97,3 +97,12 @@ class MenuCRUD(BaseCRUD):
         query = select(cls.model).filter(and_(cls.model.category_menu == '1-4 классы', cls.model.date_menu == day))
         result = await session.execute(query)
         return result.scalars().all()
+
+    @classmethod
+    async def get_all_menus_by_five_day(cls, session: AsyncSession):
+        current_date = date.today()
+        left_date = current_date - timedelta(days=3)
+        right_date = current_date + timedelta(days=5)
+        query = select(cls.model).filter(and_(cls.model.date_menu >= left_date, cls.model.date_menu <= right_date))
+        result = await session.execute(query)
+        return result.scalars().all()
