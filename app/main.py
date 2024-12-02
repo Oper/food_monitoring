@@ -223,7 +223,7 @@ async def not_found(request: Request):
 
 @app.get('/download/{menu}')
 async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = SessionDep):
-    wb = load_workbook(filename='GGGG-MM-DD-sm.xlsx')
+    wb = load_workbook(filename='templates/GGGG-MM-DD-sm.xlsx')
     sheet = wb['1']
     current_date_menu = datetime.strptime(menu, "%Y-%m-%d").date()
     sheet['J1'] = current_date_menu
