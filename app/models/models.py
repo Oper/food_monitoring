@@ -38,3 +38,26 @@ class Menu(Base):
         back_populates='menus'
     )
 
+
+class Class(Base):
+    __tablename__ = 'classes'
+
+    name_class: Mapped[str] = mapped_column(unique=True)
+    man_class = Mapped[str]
+    count_ill = Mapped[int]
+    count_class = Mapped[int]
+    proc_ill = Mapped[int]
+    closed = Mapped[bool]
+    date_closed = Mapped[date]
+    date_open = Mapped[date]
+    date = Mapped[date]
+
+
+class DataSend(Base):
+    name_class: Mapped[date] = mapped_column(unique=True)
+    count_ill = Mapped[int]
+    count_all = Mapped[int]
+    count_class_closed = Mapped[int]
+    count_ill_closed = Mapped[int]
+    count_all_closed = Mapped[int]
+    sending = Mapped[bool]
