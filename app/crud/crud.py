@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import BaseCRUD
 from app.auth.models import User
-from app.models.models import Dish, Menu
+from app.models.models import Dish, Menu, Class, DataSend
 
 
 class UserCRUD(BaseCRUD):
@@ -106,3 +106,9 @@ class MenuCRUD(BaseCRUD):
         query = select(cls.model).filter(and_(cls.model.date_menu >= left_date, cls.model.date_menu <= right_date))
         result = await session.execute(query)
         return result.scalars().all()
+
+class ClassCRUD(BaseCRUD):
+    model = Class
+
+class DataSendCRUD(BaseCRUD):
+    model = DataSend

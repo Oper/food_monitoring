@@ -17,11 +17,13 @@ from app.auth.models import User
 from app.crud.crud import MenuCRUD, DishCRUD
 from app.auth.router import router as router_auth
 from app.db import SessionDep
+from crud.crud import ClassCRUD
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
 
 class DishPydanticIn(BaseModel):
     title: str
@@ -36,13 +38,16 @@ class DishPydanticIn(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+
 class DishPydantic(DishPydanticIn):
     id: int
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+
 class DishPydanticEdit(BaseModel):
     id: int
+
 
 class MenuPydantic(BaseModel):
     date_menu: date
@@ -51,6 +56,7 @@ class MenuPydantic(BaseModel):
     dish_id: int
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
 
 class MenuPydanticEdit(BaseModel):
     id: int
@@ -109,20 +115,25 @@ async def menu_in_date(menu: str, request: Request, session: AsyncSession = Sess
 @app.post('/send_dish/')
 async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()], session: AsyncSession = SessionDep):
     try:
-        new_dish = await DishCRUD.add(session=session, title=data.title, recipe=data.recipe, out_gramm=data.out_gramm, price=data.price, calories=data.calories, protein=data.protein, fats=data.fats, carb=data.carb, section=data.section)
+        new_dish = await DishCRUD.add(session=session, title=data.title, recipe=data.recipe, out_gramm=data.out_gramm,
+                                      price=data.price, calories=data.calories, protein=data.protein, fats=data.fats,
+                                      carb=data.carb, section=data.section)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
+
 @app.post('/send_menu/')
 async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()], session: AsyncSession = SessionDep):
     try:
-        new_menu = await MenuCRUD.add(session=session, date_menu=data.date_menu, type_menu=data.type_menu, category_menu=data.category_menu, dish_id=data.dish_id)
+        new_menu = await MenuCRUD.add(session=session, date_menu=data.date_menu, type_menu=data.type_menu,
+                                      category_menu=data.category_menu, dish_id=data.dish_id)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
 
 @app.post('/del_dish/')
 async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()], session: AsyncSession = SessionDep):
@@ -133,6 +144,7 @@ async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
+
 @app.post('/del_menu/')
 async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()], session: AsyncSession = SessionDep):
     try:
@@ -142,10 +154,11 @@ async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
+
 @app.post('/edit_dish/')
 async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()], session: AsyncSession = SessionDep):
     dish = await DishCRUD.get_dish_by_id(session=session, dish_id=data.id)
-    try: #TODO
+    try:  # TODO
         pass
     except Exception as e:
         logger.error(e)
@@ -153,8 +166,10 @@ async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()],
     # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     return app.url_path_for('admin:tehnolog')
 
+
 @app.get('/admin-tehnolog/', name='admin:tehnolog', response_class=HTMLResponse)
-async def admin_nutritions(request: Request, user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
+async def admin_nutritions(request: Request, user_data: User = Depends(get_current_user),
+                           session: AsyncSession = SessionDep):
     title = 'Панель управления технолога'
     dishes = {}
     dishes_db = await DishCRUD.get_all(session=session)
@@ -199,7 +214,6 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
                 'dish_price': dish.price,
             })
 
-
     return templates.TemplateResponse(request=request, name='admin_nutritions.html',
                                       context={'title': title, 'dishes': dishes, 'menus': menus})
 
@@ -209,17 +223,21 @@ async def login(request: Request):
     title = 'Авторизация'
     return templates.TemplateResponse(request=request, name='login.html', context={'title': title})
 
+
 @app.get('/register')
 async def register(request: Request):
     title = 'Регистрация'
     return templates.TemplateResponse(request=request, name='register.html', context={'title': title})
 
+
 app.include_router(router_auth)
+
 
 @app.get('/404')
 async def not_found(request: Request):
     title = 'Страница не найдена'
     return templates.TemplateResponse(request=request, name='404.html', context={'title': title})
+
 
 @app.get('/download/{menu}')
 async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = SessionDep):
@@ -371,3 +389,40 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
 
     wb.save(result_filename)
     return FileResponse(path=result_filename, filename=result_filename, media_type='multipart/form-data')
+
+
+@app.get('/monitoring', response_class=HTMLResponse)
+async def monitoring(request: Request, session: AsyncSession = SessionDep):
+    title = 'Санитарно-эпидемиологическая обстановка в Школе'
+
+    classes_list = {}
+    current_date = date.today().isoformat()
+
+    count_all_ill = 0
+    count_all = 0
+    proc_all = 0
+
+    try:
+        row = ClassCRUD.get_all(session=session)
+        if row:
+            for count_id, raw in enumerate(row, start=1):
+                if raw.name_class not in classes_list:
+                    classes_list[raw.name_class] = []
+                classes_list[raw.name_class].append({
+                    'id': count_id,
+                    'man_class': raw.man_class,
+                    'count_ill': raw.count_ill,
+                    'count_class': raw.count_class,
+                    'proc_ill': raw.proc_ill,
+                    'closed': raw.closed,
+                    'date_closed': raw.date_closed,
+                    'date_open': raw.date_open,
+                    'date': raw.date
+                })
+    except Exception as e:
+        logger.error(e)
+
+    return templates.TemplateResponse(request=request, name='monitoring.html',
+                                      context={'title': title, 'date_todey': current_date,
+                                               'count_all_ill': count_all_ill, 'count_all': count_all,
+                                               'proc_all': proc_all, 'send_status': status, 'classes': classes_list})
