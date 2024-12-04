@@ -112,3 +112,9 @@ class ClassCRUD(BaseCRUD):
 
 class DataSendCRUD(BaseCRUD):
     model = DataSend
+
+    @classmethod
+    async def get_sends_status_by_from_date(cls, session: AsyncSession, day: date):
+        query = select(cls.model).filter(cls.model.date_send == day)
+        result = await session.execute(query)
+        return result.scalars().first()
