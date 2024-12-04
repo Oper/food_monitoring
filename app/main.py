@@ -61,6 +61,13 @@ class MenuPydantic(BaseModel):
 class MenuPydanticEdit(BaseModel):
     id: int
 
+class ClassPydanticIn(BaseModel):
+    name_class: str
+    man_class: str
+    count_class: int
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
@@ -165,6 +172,22 @@ async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()],
     # redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully edit!")
     # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     return app.url_path_for('admin:tehnolog')
+
+@app.post('/send_class/')
+async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()], session: AsyncSession = SessionDep):
+    name_class = data.name_class
+    man_class = data.man_class
+    count_class = data.count_class
+    try:
+        current_class = await ClassCRUD.get_class_by_one(session=session, name_class=name_class)
+        if current_class:
+            ...
+        else:
+            new_class = await ClassCRUD.add(session=session, name_class=name_class, man_class=man_class, count_ill=0, proc_ill=0, count_class=count_class, date=date.today())
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('admin:monitoring').include_query_params(msg="Succesfully created!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get('/admin-tehnolog/', name='admin:tehnolog', response_class=HTMLResponse)
@@ -433,6 +456,37 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     status = 'Данные на ' + current_date.isoformat() + ' отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
-                                      context={'title': title, 'date_todey': current_date.isoformat(),
+                                      context={'title': title, 'date_current': current_date,
                                                'count_all_ill': count_all_ill, 'count_all': count_all,
                                                'proc_all': proc_all, 'send_status': status, 'classes': classes_list})
+
+
+@app.get('/admin-monitoring', name='admin:monitoring', response_class=HTMLResponse)
+async def admin_monitoring(request: Request, user_data: User = Depends(get_current_user),
+                           session: AsyncSession = SessionDep):
+    title = 'Панель управления классами'
+
+    classes_list = {}
+
+    try:
+        classes = await ClassCRUD.get_all(session=session)
+        if classes:
+            for count_id, raw in enumerate(classes, start=1):
+                if raw.name_class not in classes_list:
+                    classes_list[raw.name_class] = []
+                classes_list[raw.name_class].append({
+                    'id': count_id,
+                    'man_class': raw.man_class,
+                    'count_ill': raw.count_ill,
+                    'count_class': raw.count_class,
+                    'proc_ill': raw.proc_ill,
+                    'closed': raw.closed,
+                    'date_closed': raw.date_closed,
+                    'date_open': raw.date_open,
+                    'date': raw.date
+                })
+    except Exception as e:
+        logger.error(e)
+
+    return templates.TemplateResponse(request=request, name='admin_monitoring.html',
+                                      context={'title': title,  'classes': classes_list})

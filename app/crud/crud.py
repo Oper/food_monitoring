@@ -110,6 +110,13 @@ class MenuCRUD(BaseCRUD):
 class ClassCRUD(BaseCRUD):
     model = Class
 
+    @classmethod
+    async def get_class_by_one(cls, session: AsyncSession, name_class: str) -> Class:
+        query = select(cls.model).filter(cls.model.name_class == name_class)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
+
 class DataSendCRUD(BaseCRUD):
     model = DataSend
 

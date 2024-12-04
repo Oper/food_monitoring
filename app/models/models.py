@@ -1,3 +1,4 @@
+import datetime
 from datetime import date
 
 from sqlalchemy import func, ForeignKey
@@ -46,11 +47,11 @@ class Class(Base):
     man_class: Mapped[str]
     count_ill: Mapped[int]
     count_class: Mapped[int]
-    proc_ill: Mapped[int]
-    closed: Mapped[bool]
-    date_closed: Mapped[date]
-    date_open: Mapped[date]
-    date: Mapped[date]
+    proc_ill: Mapped[int] = mapped_column(nullable=True)
+    closed: Mapped[bool] = mapped_column(nullable=True)
+    date_closed: Mapped[datetime.date] = mapped_column(nullable=True)
+    date_open: Mapped[datetime.date] = mapped_column(nullable=True)
+    date: Mapped[datetime.date] = mapped_column(nullable=True)
 
 
 class DataSend(Base):
