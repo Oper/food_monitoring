@@ -486,6 +486,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
                 })
     except Exception as e:
         logger.error(e)
+
     send_status = False
     try:
         sending_mail_data = await DataSendCRUD.get_sends_status_by_from_date(session=session, day=current_date)
@@ -496,6 +497,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     status = 'Данные на ' + current_date.isoformat() + ' отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
+
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
                                       context={'title': title, 'date_current': current_date,

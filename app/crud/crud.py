@@ -119,6 +119,12 @@ class ClassCRUD(BaseCRUD):
         result = await session.execute(query)
         return result.scalar_one_or_none()
 
+    @classmethod
+    async def get_all(cls, session: AsyncSession):
+        query = select(cls.model).order_by('name_class')
+        result = await session.execute(query)
+        records = result.scalars().all()
+        return records
 
 class DataSendCRUD(BaseCRUD):
     model = DataSend
