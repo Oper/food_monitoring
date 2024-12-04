@@ -70,9 +70,17 @@ class ClassPydanticIn(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 
-class ClassPyganticOne(BaseModel):
+class ClassPydanticOne(BaseModel):
     name_class: str
 
+
+class ClassDataPydanticSend(BaseModel):
+    name_class: str
+    count_ill: int
+    closed: bool
+    date: date
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
@@ -181,7 +189,7 @@ async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()],
     return app.url_path_for('admin:tehnolog')
 
 
-@app.post('/send_class/')
+@app.post('/create_class/')
 async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()], session: AsyncSession = SessionDep):
     name_class = data.name_class
     man_class = data.man_class
@@ -190,7 +198,7 @@ async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()
         current_class = await ClassCRUD.get_class_by_one(session=session, name_class=name_class)
         if current_class:
             values = data.model_dump()
-            await ClassCRUD.update(session=session, filters=ClassPyganticOne(name_class=name_class),
+            await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
                                    values=ClassPydanticIn(**values))
         else:
             await ClassCRUD.add(session=session, name_class=name_class, man_class=man_class, count_ill=0, proc_ill=0,
@@ -202,13 +210,25 @@ async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()
 
 
 @app.post('/del_class')
-async def del_class(request: Request, data: Annotated[ClassPyganticOne, Form()], session: AsyncSession = SessionDep):
+async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()], session: AsyncSession = SessionDep):
     name_class = data.name_class
     try:
-        await ClassCRUD.delete(session=session, filters=ClassPyganticOne(name_class=name_class))
+        await ClassCRUD.delete(session=session, filters=ClassPydanticOne(name_class=name_class))
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:monitoring').include_query_params(msg="Succesfully deleted!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post('/send_data_class')
+async def send_data_class(request: Request, data: Annotated[ClassDataPydanticSend, Form()],
+                          session: AsyncSession = SessionDep):
+    name_class = data.name_class
+    try:
+        await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class), values=data)
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('monitoring').include_query_params(msg="Succesfully send data!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
