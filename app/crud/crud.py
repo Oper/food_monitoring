@@ -2,7 +2,7 @@ from datetime import timedelta, date
 
 from loguru import logger
 from pydantic import BaseModel
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -65,6 +65,7 @@ class UserCRUD(BaseCRUD):
             raise e
         return new_instance
 
+
 class DishCRUD(BaseCRUD):
     model = Dish
 
@@ -73,6 +74,7 @@ class DishCRUD(BaseCRUD):
         query = select(cls.model).filter_by(id=dish_id)
         result = await session.execute(query)
         return result.scalar_one_or_none()
+
 
 class MenuCRUD(BaseCRUD):
     model = Menu
@@ -106,6 +108,7 @@ class MenuCRUD(BaseCRUD):
         query = select(cls.model).filter(and_(cls.model.date_menu >= left_date, cls.model.date_menu <= right_date))
         result = await session.execute(query)
         return result.scalars().all()
+
 
 class ClassCRUD(BaseCRUD):
     model = Class

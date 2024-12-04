@@ -11,8 +11,8 @@
     <title>{{ title }}</title>
 </head>
 <body>
-<div class="container-md">
-    <h3 class="text-center">{{ title }}</h3>
+<div class="container-md"><br>
+    <h3 class="text-center">{{ title }}</h3><br>
     <div class="table-responsive">
         <table class="table table-bordered table-sm">
             <thead>
@@ -35,7 +35,7 @@
                 <td class="text-center">{{ item.count_ill }}</td>
                 <td class="text-center">{{ item.count_class }}</td>
                 <td class="text-center">
-                    <form method="get">
+                    <form action="/del_class" method="post">
                         <input type="text" class="d-none" name="name_class" value="{{ j_key }}">
                         <button type="submit" class="btn btn-danger">Удалить</button>
                     </form>

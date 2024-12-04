@@ -61,12 +61,17 @@ class MenuPydantic(BaseModel):
 class MenuPydanticEdit(BaseModel):
     id: int
 
+
 class ClassPydanticIn(BaseModel):
     name_class: str
     man_class: str
     count_class: int
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+
+class ClassPyganticOne(BaseModel):
+    name_class: str
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -144,8 +149,9 @@ async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()], s
 
 @app.post('/del_dish/')
 async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()], session: AsyncSession = SessionDep):
+    id_dish = data.id
     try:
-        await DishCRUD.delete(session=session, id=data.id)
+        await DishCRUD.delete(session=session, filters=DishPydanticEdit(id=id_dish))
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully deleted!")
@@ -154,8 +160,9 @@ async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()
 
 @app.post('/del_menu/')
 async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()], session: AsyncSession = SessionDep):
+    id_menu = data.id
     try:
-        await MenuCRUD.delete(session=session, id=data.id)
+        await MenuCRUD.delete(session=session, filters=MenuPydanticEdit(id=id_menu))
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully deleted!")
@@ -173,6 +180,7 @@ async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()],
     # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     return app.url_path_for('admin:tehnolog')
 
+
 @app.post('/send_class/')
 async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()], session: AsyncSession = SessionDep):
     name_class = data.name_class
@@ -181,12 +189,26 @@ async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()
     try:
         current_class = await ClassCRUD.get_class_by_one(session=session, name_class=name_class)
         if current_class:
-            ...
+            values = data.model_dump()
+            await ClassCRUD.update(session=session, filters=ClassPyganticOne(name_class=name_class),
+                                   values=ClassPydanticIn(**values))
         else:
-            new_class = await ClassCRUD.add(session=session, name_class=name_class, man_class=man_class, count_ill=0, proc_ill=0, count_class=count_class, date=date.today())
+            await ClassCRUD.add(session=session, name_class=name_class, man_class=man_class, count_ill=0, proc_ill=0,
+                                count_class=count_class, date=date.today())
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:monitoring').include_query_params(msg="Succesfully created!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post('/del_class')
+async def del_class(request: Request, data: Annotated[ClassPyganticOne, Form()], session: AsyncSession = SessionDep):
+    name_class = data.name_class
+    try:
+        await ClassCRUD.delete(session=session, filters=ClassPyganticOne(name_class=name_class))
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('admin:monitoring').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -489,4 +511,4 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='admin_monitoring.html',
-                                      context={'title': title,  'classes': classes_list})
+                                      context={'title': title, 'classes': classes_list})
