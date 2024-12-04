@@ -17,7 +17,8 @@ from app.auth.models import User
 from app.crud.crud import MenuCRUD, DishCRUD
 from app.auth.router import router as router_auth
 from app.db import SessionDep
-from crud.crud import ClassCRUD
+from crud.crud import ClassCRUD, DataSendCRUD
+from models.models import DataSend
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -395,15 +396,15 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
 async def monitoring(request: Request, session: AsyncSession = SessionDep):
     title = 'Санитарно-эпидемиологическая обстановка в Школе'
 
+    current_date = date.today()
     classes_list = {}
-    current_date = date.today().isoformat()
 
     count_all_ill = 0
     count_all = 0
     proc_all = 0
 
     try:
-        row = ClassCRUD.get_all(session=session)
+        row = await ClassCRUD.get_all(session=session)
         if row:
             for count_id, raw in enumerate(row, start=1):
                 if raw.name_class not in classes_list:
@@ -421,8 +422,18 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
                 })
     except Exception as e:
         logger.error(e)
+    send_status = False
+    try:
+        sending_mail_data = await DataSendCRUD.get_sends_status_by_from_date(session=session, day=current_date)
+        if sending_mail_data:
+            for _ in sending_mail_data:
+                send_status = _.sending
+    except Exception as e:
+        logger.error(e)
+
+    status = 'Данные на ' + current_date.isoformat() + ' отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
-                                      context={'title': title, 'date_todey': current_date,
+                                      context={'title': title, 'date_todey': current_date.isoformat(),
                                                'count_all_ill': count_all_ill, 'count_all': count_all,
                                                'proc_all': proc_all, 'send_status': status, 'classes': classes_list})
