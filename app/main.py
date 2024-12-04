@@ -18,7 +18,6 @@ from app.crud.crud import MenuCRUD, DishCRUD
 from app.auth.router import router as router_auth
 from app.db import SessionDep
 from crud.crud import ClassCRUD, DataSendCRUD
-from models.models import DataSend
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")

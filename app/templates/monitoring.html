@@ -30,7 +30,7 @@
             </tr>
             </thead>
             <tbody class="table-group-divider">
-            {% for j_key, j_value in classes_list.items() %}
+            {% for j_key, j_value in classes.items() %}
             <tr>
                 {% for item in j_value %}
                 <th class="text-center" scope="row">{{ item.id }}</th>
@@ -80,7 +80,7 @@
                             <div class="col">
                                 <div class="form-floating">
                                     <select class="form-select" id="floatingSelectGridNameClass" name="name_class">
-                                        {% for j_key, j_value in json_data.items() %}
+                                        {% for j_key, j_value in classes.items() %}
                                         <option>{{ j_key }}</option>
                                         {% endfor %}
                                     </select>
@@ -124,11 +124,7 @@
             <div class="row">
                 <div class="col-2"></div>
                 <div class="col-6">
-                    {% for cat, msg in get_flashed_messages(True) %}
-                    <div class="alert {{ cat }}" role="alert">
-                        {{ msg }}
-                    </div>
-                    {% endfor %}
+
                 </div>
                 <div class="col-2"></div>
             </div>
