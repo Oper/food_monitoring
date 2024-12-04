@@ -54,6 +54,8 @@ class Class(Base):
 
 
 class DataSend(Base):
+    __tablename__ = 'datasends'
+
     name_class: Mapped[date] = mapped_column(unique=True)
     count_ill = Mapped[int]
     count_all = Mapped[int]
