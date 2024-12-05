@@ -18,15 +18,15 @@
         <table class="table table-bordered border-dark table-sm">
             <thead>
             <tr class="table-primary">
-                <th scope="col">#</th>
-                <th scope="col">Класс</th>
+                <th class="text-center" scope="col">#</th>
+                <th class="text-center" scope="col">Класс</th>
                 <th scope="col">Классный руководитель</th>
-                <th scope="col">Количество болеющих</th>
-                <th scope="col">Количество в классе</th>
-                <th scope="col">Процент болеющих</th>
-                <th scope="col">Дата актуализации</th>
-                <th scope="col">Закрыт с:</th>
-                <th scope="col">Закрыт по:</th>
+                <th class="text-center" scope="col">Количество <br>болеющих</th>
+                <th class="text-center" scope="col">Количество <br>в классе</th>
+                <th class="text-center" scope="col">Процент <br>болеющих</th>
+                <th class="text-center" scope="col">Дата <br>актуализации</th>
+                <th class="text-center" scope="col">Закрыт с:</th>
+                <th class="text-center" scope="col">Закрыт по:</th>
             </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -110,7 +110,9 @@
                                 <button type="submit" class="btn btn-primary mb-3">Отправить</button>
                             </div>
                             <div class="align-items-center">
-                                <input type="radio" id="opens_off" name="opens" value="0">
+                                <input type="number" aria-label="Количество дней" class="form-control"
+                                       name="count_day" value="7">
+                                <input type="radio" id="opens_off" name="closed" value="0">
                                 <label for="opens_off">Не закрывать</label>
                                 <input class="d-none" type="radio" id="opens_on" name="closed" value="1" checked>
                                 <label class="d-none" for="opens_on">Закрыть</label>
