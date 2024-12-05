@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Annotated
 from venv import logger
 
@@ -78,9 +78,22 @@ class ClassDataPydanticSend(BaseModel):
     name_class: str
     count_ill: int
     closed: bool
+    count_day: int
     date: date
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+
+class ClassDataPydantic(BaseModel):
+    count_ill: int
+    proc_ill: int
+    closed: bool
+    date_closed: date | None
+    date_open: date | None
+    date: date
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
@@ -224,8 +237,56 @@ async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()],
 async def send_data_class(request: Request, data: Annotated[ClassDataPydanticSend, Form()],
                           session: AsyncSession = SessionDep):
     name_class = data.name_class
+    count_ill = data.count_ill
+    date_send = data.date
+    count_day = data.count_day
+    closed = data.closed
+
     try:
-        await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class), values=data)
+        current_class = await ClassCRUD.get_class_by_one(session=session, name_class=name_class)
+        proc_ill = 0 if count_ill == 0 else round(count_ill * 100 / current_class.count_class)
+        if current_class:
+            if current_class.closed and closed:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=closed,
+                                           date=date_send,
+                                           date_open=current_class.date_open,
+                                           date_closed=current_class.date_closed
+                                       ))
+            elif current_class.closed and not closed:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=False,
+                                           date=date_send,
+                                           date_open=None,
+                                           date_closed=None
+                                       ))
+            elif closed and proc_ill > 20:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=True,
+                                           date=date_send,
+                                           date_open=date_send + timedelta(days=count_day),
+                                           date_closed=date_send + timedelta(days=1)
+                                       ))
+            else:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=False,
+                                           date=date_send,
+                                           date_open=None,
+                                           date_closed=None
+                                       ))
+
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('monitoring').include_query_params(msg="Succesfully send data!")
@@ -497,7 +558,6 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     status = 'Данные на ' + current_date.isoformat() + ' отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
-
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
                                       context={'title': title, 'date_current': current_date,
