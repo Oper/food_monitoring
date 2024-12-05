@@ -532,6 +532,8 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
         row = await ClassCRUD.get_all(session=session)
         if row:
             for count_id, raw in enumerate(row, start=1):
+                count_all += raw.count_class
+                count_all_ill += raw.count_ill
                 if raw.name_class not in classes_list:
                     classes_list[raw.name_class] = []
                 classes_list[raw.name_class].append({
@@ -547,6 +549,8 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
                 })
     except Exception as e:
         logger.error(e)
+
+    proc_all = 0 if count_all_ill==0 else round(count_all_ill * 100 / count_all)
 
     send_status = False
     try:
