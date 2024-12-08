@@ -22,6 +22,7 @@ from app.auth.router import router as router_auth
 from app.db import SessionDep
 from app.crud.crud import ClassCRUD, DataSendCRUD
 from app.scheduler.datasend import add_datasend
+from scheduler.datasend import send_datasend
 
 scheduler = AsyncIOScheduler()
 
@@ -38,9 +39,20 @@ async def lifespan(app: FastAPI):
         # Настройка и запуск планировщика
         scheduler.add_job(
             add_datasend,
-            trigger=IntervalTrigger(minutes=1),
-            max_instances=2,
-            id='datasend',
+            'cron',
+            day_of_week='mon-fri',
+            hour='9-12',
+            minute='*',
+            id='add_datasend',
+            replace_existing=True
+        )
+        scheduler.add_job(
+            send_datasend,
+            'cron',
+            day_of_week='mon-fri',
+            hour='9',
+            minute='50-59/1',
+            id='send_datasend',
             replace_existing=True
         )
         scheduler.start()
