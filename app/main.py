@@ -652,3 +652,25 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
 
     return templates.TemplateResponse(request=request, name='admin_monitoring.html',
                                       context={'title': title, 'classes': classes_list})
+
+@app.get('/analysis', response_class=HTMLResponse)
+async def analysis(request: Request, session: AsyncSession = SessionDep):
+    title = 'Анализ заболеваемости'
+    json_data = {}
+    labels = []
+    data = []
+    tmp = await DataSendCRUD.get_last_by_30(session=session)
+    for d in tmp:
+        labels.append(d.date_send)
+        data.append(d.count_all_ill)
+    for count, i in enumerate(tmp, start=1):
+        if i.date_send not in json_data:
+            json_data[i.date_send] = []
+        json_data[i.date_send].append({
+            'id': count,
+            'count_all_ill': i.count_all_ill,
+            'count_class_closed': i.count_class_closed
+        })
+    print(labels, data)
+    return templates.TemplateResponse(request=request, name='analysis.html',
+                                      context={'title': title, 'json_data': json_data, 'labels':labels, 'data':data})
