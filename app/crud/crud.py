@@ -126,6 +126,7 @@ class ClassCRUD(BaseCRUD):
         records = result.scalars().all()
         return records
 
+
 class DataSendCRUD(BaseCRUD):
     model = DataSend
 
@@ -134,3 +135,9 @@ class DataSendCRUD(BaseCRUD):
         query = select(cls.model).filter(cls.model.date_send == day)
         result = await session.execute(query)
         return result.scalars().first()
+
+    @classmethod
+    async def get_datasend_by_one_day(cls, session: AsyncSession, day: date) -> DataSend:
+        query = select(cls.model).filter(cls.model.date_send == day)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
