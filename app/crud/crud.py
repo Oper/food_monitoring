@@ -141,3 +141,10 @@ class DataSendCRUD(BaseCRUD):
         query = select(cls.model).filter(cls.model.date_send == day)
         result = await session.execute(query)
         return result.scalar_one_or_none()
+
+    @classmethod
+    async def get_last_by_30(cls, session: AsyncSession):
+        query = select(cls.model).limit(30)
+        result = await session.execute(query)
+        records = result.scalars().all()
+        return records
