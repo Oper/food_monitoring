@@ -593,7 +593,6 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
 
     count_all_ill = 0
     count_all = 0
-    proc_all = 0
 
     try:
         row = await ClassCRUD.get_all(session=session)
@@ -683,6 +682,5 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
             'count_all_ill': i.count_all_ill,
             'count_class_closed': i.count_class_closed
         })
-    print(labels, data)
     return templates.TemplateResponse(request=request, name='analysis.html',
                                       context={'title': title, 'json_data': json_data, 'labels':labels, 'data':data})
