@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
         # Настройка и запуск планировщика
         scheduler.add_job(
             add_datasend,
-            trigger=IntervalTrigger(seconds=30),
+            trigger=IntervalTrigger(minutes=10),
             id='datasend',
             replace_existing=True
         )
@@ -610,9 +610,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     try:
         sending_mail_data = await DataSendCRUD.get_sends_status_by_from_date(session=session, day=current_date)
         if sending_mail_data:
-            for _ in sending_mail_data:
-                send_status = _.sending
-                print(send_status)
+            send_status = sending_mail_data.sending
     except Exception as e:
         logger.error(e)
 
