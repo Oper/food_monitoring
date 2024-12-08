@@ -1,7 +1,9 @@
+from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
 from typing import Annotated
 from venv import logger
 
+from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -11,15 +13,47 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import RedirectResponse, FileResponse
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from app.auth.dependencies import get_current_user
 from app.auth.models import User
 from app.crud.crud import MenuCRUD, DishCRUD
 from app.auth.router import router as router_auth
 from app.db import SessionDep
-from crud.crud import ClassCRUD, DataSendCRUD
+from app.crud.crud import ClassCRUD, DataSendCRUD
+from app.scheduler.datasend import add_datasend
 
-app = FastAPI()
+scheduler = AsyncIOScheduler()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Управляет жизненным циклом планировщика приложения
+
+    Args:
+        app (FastAPI): Экземпляр приложения FastAPI
+    """
+    try:
+        # Настройка и запуск планировщика
+        scheduler.add_job(
+            add_datasend,
+            trigger=IntervalTrigger(seconds=30),
+            id='datasend',
+            replace_existing=True
+        )
+        scheduler.start()
+        logger.info("Планировщик обновления данных")
+        yield
+    except Exception as e:
+        logger.error(f"Ошибка инициализации планировщика: {e}")
+    finally:
+        # Завершение работы планировщика
+        scheduler.shutdown()
+        logger.info("Планировщик обновления данных")
+
+
+app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
@@ -95,6 +129,20 @@ class ClassDataPydantic(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 
+class ClassDataPydanticAdd(BaseModel):
+    name_class: str
+    man_class: str
+    count_class: int
+    count_ill: int
+    proc_ill: int
+    closed: bool
+    date_closed: date | None
+    date_open: date | None
+    date: date
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
     return templates.TemplateResponse(request=request, name='main.html')
@@ -148,9 +196,7 @@ async def menu_in_date(menu: str, request: Request, session: AsyncSession = Sess
 @app.post('/send_dish/')
 async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()], session: AsyncSession = SessionDep):
     try:
-        new_dish = await DishCRUD.add(session=session, title=data.title, recipe=data.recipe, out_gramm=data.out_gramm,
-                                      price=data.price, calories=data.calories, protein=data.protein, fats=data.fats,
-                                      carb=data.carb, section=data.section)
+        new_dish = await DishCRUD.add(session=session, values=data)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
@@ -160,8 +206,7 @@ async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()],
 @app.post('/send_menu/')
 async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()], session: AsyncSession = SessionDep):
     try:
-        new_menu = await MenuCRUD.add(session=session, date_menu=data.date_menu, type_menu=data.type_menu,
-                                      category_menu=data.category_menu, dish_id=data.dish_id)
+        new_menu = await MenuCRUD.add(session=session, values=data)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
@@ -214,8 +259,17 @@ async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()
             await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
                                    values=ClassPydanticIn(**values))
         else:
-            await ClassCRUD.add(session=session, name_class=name_class, man_class=man_class, count_ill=0, proc_ill=0,
-                                count_class=count_class, date=date.today())
+            await ClassCRUD.add(session=session,
+                                values=ClassDataPydanticAdd(
+                                    name_class=name_class,
+                                    man_class=man_class,
+                                    count_class=count_class,
+                                    count_ill=0,
+                                    proc_ill=0,
+                                    closed=False,
+                                    date_open=None,
+                                    date_closed=None,
+                                    date=date.today()))
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:monitoring').include_query_params(msg="Succesfully created!")
@@ -550,7 +604,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     except Exception as e:
         logger.error(e)
 
-    proc_all = 0 if count_all_ill==0 else round(count_all_ill * 100 / count_all)
+    proc_all = 0 if count_all_ill == 0 else round(count_all_ill * 100 / count_all)
 
     send_status = False
     try:
@@ -558,6 +612,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
         if sending_mail_data:
             for _ in sending_mail_data:
                 send_status = _.sending
+                print(send_status)
     except Exception as e:
         logger.error(e)
 
