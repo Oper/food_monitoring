@@ -38,19 +38,20 @@ async def lifespan(app: FastAPI):
         # Настройка и запуск планировщика
         scheduler.add_job(
             add_datasend,
-            trigger=IntervalTrigger(minutes=10),
+            trigger=IntervalTrigger(minutes=1),
+            max_instances=2,
             id='datasend',
             replace_existing=True
         )
         scheduler.start()
-        logger.info("Планировщик обновления данных")
+        logger.info("Планировщик обновления и передачи данных запущен")
         yield
     except Exception as e:
         logger.error(f"Ошибка инициализации планировщика: {e}")
     finally:
         # Завершение работы планировщика
         scheduler.shutdown()
-        logger.info("Планировщик обновления данных")
+        logger.info("Планировщик остановлен")
 
 
 app = FastAPI(lifespan=lifespan)

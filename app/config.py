@@ -12,6 +12,12 @@ DB_PASS = os.environ.get('DB_PASS')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 ALGORITHM = os.environ.get('ALGORITHM')
 
+HOST_MAIL = os.environ.get('HOST_MAIL')
+PORT_MAIL = os.environ.get('PORT_MAIL')
+USER_MAIL = os.environ.get('USER_MAIL')
+PASSWORD_MAIL= os.environ.get('PASSWORD_MAIL')
+TO_MAIL = os.environ.get('TO_MAIL')
+
 def get_link_db(driver: str) -> str:
     """
     using your DB

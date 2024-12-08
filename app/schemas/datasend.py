@@ -23,3 +23,6 @@ class DataSendPydanticUpdate(BaseModel):
 
 class DataSendPydanticDay(BaseModel):
     date_send: date
+
+class DataSendPydanticAddSending(BaseModel):
+    sending: bool
