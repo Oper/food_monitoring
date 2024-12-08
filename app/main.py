@@ -3,7 +3,6 @@ from datetime import date, datetime, timedelta
 from typing import Annotated
 from venv import logger
 
-from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -664,6 +663,7 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
     return templates.TemplateResponse(request=request, name='admin_monitoring.html',
                                       context={'title': title, 'classes': classes_list})
 
+
 @app.get('/analysis', response_class=HTMLResponse)
 async def analysis(request: Request, session: AsyncSession = SessionDep):
     title = 'Анализ заболеваемости'
@@ -683,4 +683,4 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
             'count_class_closed': i.count_class_closed
         })
     return templates.TemplateResponse(request=request, name='analysis.html',
-                                      context={'title': title, 'json_data': json_data, 'labels':labels, 'data':data})
+                                      context={'title': title, 'json_data': json_data, 'labels': labels, 'data': data})

@@ -58,6 +58,7 @@ async def add_datasend(session: AsyncSession):
     except Exception as e:
         logger.error(e)
 
+
 @session_manager.connection()
 async def send_datasend(session: AsyncSession):
     current_date = date.today()
