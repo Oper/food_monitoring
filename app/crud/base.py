@@ -9,15 +9,20 @@ class BaseCRUD:
     model = None
 
     @classmethod
-    async def add(cls, session: AsyncSession, **value):
-        new = cls.model(**value)
-        session.add(new)
+    async def add(cls, session: AsyncSession, values: BaseModel):
+        # Добавить одну запись
+        values_dict = values.model_dump(exclude_unset=True)
+        logger.info(f"Добавление записи {cls.model.__name__} с параметрами: {values_dict}")
+        new_instance = cls.model(**values_dict)
+        session.add(new_instance)
         try:
-            await session.commit()
-        except SQLAlchemyError as error:
+            await session.flush()
+            logger.info(f"Запись {cls.model.__name__} успешно добавлена.")
+        except SQLAlchemyError as e:
             await session.rollback()
-            raise error
-        return new
+            logger.error(f"Ошибка при добавлении записи: {e}")
+            raise e
+        return new_instance
 
     @classmethod
     async def get_all(cls, session: AsyncSession):
