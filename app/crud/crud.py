@@ -75,6 +75,12 @@ class DishCRUD(BaseCRUD):
         result = await session.execute(query)
         return result.scalar_one_or_none()
 
+    @classmethod
+    async def get_dish_by_name(cls, session: AsyncSession, dish_name: str) -> Dish:
+        query = select(cls.model).filter_by(title=dish_name)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
 
 class MenuCRUD(BaseCRUD):
     model = Menu
