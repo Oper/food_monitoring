@@ -85,15 +85,11 @@ class DishPydanticIn(BaseModel):
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 
-class DishPydantic(DishPydanticIn):
-    id: int
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
-
 class DishPydanticEdit(BaseModel):
     id: int
 
+class DishPydanticTitle(BaseModel):
+    title: str
 
 class MenuPydantic(BaseModel):
     date_menu: date
@@ -103,6 +99,7 @@ class MenuPydantic(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+
 class MenuPydanticListIn(BaseModel):
     date_menu: date
     type_menu: str
@@ -110,6 +107,7 @@ class MenuPydanticListIn(BaseModel):
     dishs_ids: Optional[List[int]] = None
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
 
 class MenuPydanticEdit(BaseModel):
     id: int
@@ -215,7 +213,11 @@ async def menu_in_date(menu: str, request: Request, session: AsyncSession = Sess
 @app.post('/send_dish/')
 async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()], session: AsyncSession = SessionDep):
     try:
-        new_dish = await DishCRUD.add(session=session, values=data)
+        dish = await DishCRUD.get_dish_by_name(session=session, dish_name=data.title)
+        if dish:
+            await DishCRUD.update(session=session, filters=DishPydanticTitle(title=data.title), values=data)
+        else:
+            await DishCRUD.add(session=session, values=data)
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
@@ -223,7 +225,8 @@ async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()],
 
 
 @app.post('/send_menu/')
-async def create_menu(request: Request, data: Annotated[MenuPydanticListIn, Form()], session: AsyncSession = SessionDep):
+async def create_menu(request: Request, data: Annotated[MenuPydanticListIn, Form()],
+                      session: AsyncSession = SessionDep):
     menu_dict = data.model_dump()
     try:
         for id in menu_dict['dishs_ids']:
@@ -258,18 +261,6 @@ async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
-
-
-@app.post('/edit_dish/')
-async def edit_dish(request: Request, data: Annotated[DishPydanticEdit, Form()], session: AsyncSession = SessionDep):
-    dish = await DishCRUD.get_dish_by_id(session=session, dish_id=data.id)
-    try:  # TODO
-        pass
-    except Exception as e:
-        logger.error(e)
-    # redirect_url = request.url_for('admin_nutritions').include_query_params(msg="Succesfully edit!")
-    # return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
-    return app.url_path_for('admin:tehnolog')
 
 
 @app.post('/create_class/')
