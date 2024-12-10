@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Optional, List
 from venv import logger
 
 from fastapi import FastAPI, Request, Form, Depends
@@ -103,6 +103,13 @@ class MenuPydantic(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+class MenuPydanticListIn(BaseModel):
+    date_menu: date
+    type_menu: str
+    category_menu: str
+    dishs_ids: Optional[List[int]] = None
+
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 class MenuPydanticEdit(BaseModel):
     id: int
@@ -216,9 +223,15 @@ async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()],
 
 
 @app.post('/send_menu/')
-async def create_menu(request: Request, data: Annotated[MenuPydantic, Form()], session: AsyncSession = SessionDep):
+async def create_menu(request: Request, data: Annotated[MenuPydanticListIn, Form()], session: AsyncSession = SessionDep):
+    menu_dict = data.model_dump()
     try:
-        new_menu = await MenuCRUD.add(session=session, values=data)
+        for id in menu_dict['dishs_ids']:
+            await MenuCRUD.add(session=session, values=MenuPydantic(
+                date_menu=menu_dict['date_menu'],
+                type_menu=menu_dict['type_menu'],
+                category_menu=menu_dict['category_menu'],
+                dish_id=id))
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin:tehnolog').include_query_params(msg="Succesfully created!")
