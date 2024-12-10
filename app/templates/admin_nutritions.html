@@ -5,6 +5,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', path='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
     <script src="{{ url_for('static', path='js/chart.js') }}"></script>
+    <script src="{{ url_for('static', path='js/jquery.min.js') }}"></script>
     <link href="{{ url_for('static', path='css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ url_for('static', path='js/bootstrap.bundle.min.js') }}"></script>
     <title>{{ title }}</title>
@@ -153,7 +154,7 @@
                         {% endfor %}
                     </div>
                     {% endfor %}
-                <a class="btn btn-primary" href="/download/{{ d_key }}">Скачать</a>
+                    <a class="btn btn-primary" href="/download/{{ d_key }}">Скачать</a>
                 </div>
             </div>
         </div>
@@ -195,7 +196,8 @@
                             <br>
                             <div class="input-group">
                                 <span class="input-group-text">Калории</span>
-                                <input type="number" aria-label="Калории" class="form-control" name="calories" step=".1" required>
+                                <input type="number" aria-label="Калории" class="form-control" name="calories" step=".1"
+                                       required>
                             </div>
                             <br>
                             <div class="input-group">
@@ -281,17 +283,31 @@
                             </div>
                             <br>
                             <div class="input-group">
-                                <span class="input-group-text">Блюдо</span>
-                                <select class="form-select" name="dish_id">
-                                    {% for j_key, j_value in dishes.items() %}
-                                    {% for item in j_value %}
-                                    <option value="{{ item.id }}">{{ j_key }}</option>
-                                    {% endfor %}
-                                    {% endfor %}
-                                </select>
+                                <div data-role="dynamic-fields" class="">
+
+                                    <div class="form-inline form-group">
+                                        <span class="input-group-text">Блюдо</span>
+                                        <select class="form-select" name="dishs_ids">
+                                            {% for j_key, j_value in dishes.items() %}
+                                            {% for item in j_value %}
+                                            <option value="{{ item.id }}">{{ j_key }}</option>
+                                            {% endfor %}
+                                            {% endfor %}
+                                        </select>
+
+                                        <span>-</span>
+                                        <button class="btn btn-danger" data-role="remove">
+                                            <span class="glyphicon c"></span>
+                                        </button>
+                                        <button class="btn btn-primary" data-role="add">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </div>  <!-- /div.form-inline -->
+                                </div>
+
                             </div>
                             <br>
-                            <input class="d-none" name="type_form" type="text" value="menu">
+
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button type="submit" class="btn btn-primary">Добавить</button>
                             </div>
@@ -312,4 +328,52 @@
     <p class="text-center text-body-secondary">2024 © МБОУ "Средняя общеобразовательная школа №1" г.Емвы</p>
 </footer>
 </body>
+<script>
+    $(function() {
+        // Remove button click
+        $(document).on(
+            'click',
+            '[data-role="dynamic-fields"] > .form-inline [data-role="remove"]',
+            function(e) {
+                e.preventDefault();
+                $(this).closest('.form-inline').remove();
+            }
+        );
+        // Add button click
+        $(document).on(
+            'click',
+            '[data-role="dynamic-fields"] > .form-inline [data-role="add"]',
+            function(e) {
+                e.preventDefault();
+                var container = $(this).closest('[data-role="dynamic-fields"]');
+                new_field_group = container.children().filter('.form-inline:first-child').clone();
+                new_field_group.find('input').each(function(){
+                    $(this).val('');
+                });
+                container.append(new_field_group);
+            }
+        );
+    });
+</script>
+<style>
+html, body {
+padding-top: 20px;
+}
+
+[data-role="dynamic-fields"] > .form-inline + .form-inline {
+    margin-top: 0.5em;
+}
+
+[data-role="dynamic-fields"] > .form-inline [data-role="add"] {
+    display: none;
+}
+
+[data-role="dynamic-fields"] > .form-inline:last-child [data-role="add"] {
+    display: inline-block;
+}
+
+[data-role="dynamic-fields"] > .form-inline:last-child [data-role="remove"] {
+    display: none;
+}
+</style>
 </html>
