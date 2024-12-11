@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="{{ url_for('static', path='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
-    <script src="{{ url_for('static', path='js/chart.js') }}"></script>
     <link href="{{ url_for('static', path='css/bootstrap.min.css') }}" rel="stylesheet">
     <script src="{{ url_for('static', path='js/bootstrap.bundle.min.js') }}"></script>
     <title>{{ title }}</title>
@@ -13,21 +12,21 @@
 <body>
 <div class="container-md"><br>
     <h3 class="text-center">{{ title }}</h3>
-    <small class="d-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-success-subtle border border-success-subtle rounded-2">{{
+    <small class="d-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis border border-success-subtle rounded-2">{{
         send_status }}</small>
     <div class="table-responsive">
         <table class="table table-bordered border-dark table-sm">
             <thead>
             <tr class="table-primary">
-                <th class="text-center" scope="col">#</th>
-                <th class="text-center" scope="col">Класс</th>
-                <th scope="col">Классный руководитель</th>
-                <th class="text-center" scope="col">Количество <br>болеющих</th>
-                <th class="text-center" scope="col">Количество <br>в классе</th>
-                <th class="text-center" scope="col">Процент <br>болеющих</th>
-                <th class="text-center" scope="col">Дата <br>актуализации</th>
-                <th class="text-center" scope="col">Закрыт с:</th>
-                <th class="text-center" scope="col">Закрыт по:</th>
+                <th class="text-center align-middle" scope="col">#</th>
+                <th class="text-center align-middle" scope="col">Класс</th>
+                <th class="align-middle" scope="col">Классный руководитель</th>
+                <th class="align-middle text-center" scope="col">Количество <br>болеющих</th>
+                <th class="align-middle text-center" scope="col">Количество <br>в классе</th>
+                <th class="align-middle text-center" scope="col">Процент <br>болеющих</th>
+                <th class="text-center align-middle" scope="col">Дата <br>актуализации</th>
+                <th class="text-center align-middle" scope="col">Закрыт с:</th>
+                <th class="text-center align-middle" scope="col">Закрыт по:</th>
             </tr>
             </thead>
             <tbody class="table-group-divider">
