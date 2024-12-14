@@ -676,7 +676,7 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
     data = []
     tmp = await DataSendCRUD.get_last_by_30(session=session)
     for d in tmp:
-        labels.append(d.date_send)
+        labels.append(d.date_send.isoformat())
         data.append(d.count_all_ill)
     for count, i in enumerate(tmp, start=1):
         if i.date_send not in json_data:
