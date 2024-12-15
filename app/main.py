@@ -498,18 +498,21 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['H20'] = dish.protein
                     sheet['I20'] = dish.fats
                     sheet['J20'] = dish.carb
+
+    patch_file = os.path.join('tmp', result_filename)
     try:
+
         if os.path.exists('tmp'):
-            wb.save('tmp/' + result_filename)
+            wb.save(patch_file)
             logger.info('Создаем файл в папке - tmp')
         else:
             os.mkdir('tmp')
             logger.info('Создали папку, т.к. ее нет')
-            wb.save('tmp/' + result_filename)
+            wb.save(patch_file)
             logger.info('Создаем файл в папке - tmp')
     except Exception as e:
         logger.error(e)
-    return FileResponse(path='tmp/' + result_filename, filename=result_filename, media_type='multipart/form-data')
+    return FileResponse(path=patch_file, filename=result_filename, media_type='multipart/form-data')
 
 
 @app.get('/monitoring', response_class=HTMLResponse)
@@ -565,7 +568,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     proc_all = 0 if count_all_ill == 0 else round(count_all_ill * 100 / count_all)
-    print(classes_list)
+
     send_status = False
     try:
         sending_mail_data = await DataSendCRUD.get_sends_status_by_from_date(session=session, day=current_date)
