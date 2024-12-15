@@ -515,27 +515,47 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     try:
         row = await ClassCRUD.get_all(session=session)
         if row:
-            for count_id, raw in enumerate(row, start=1):
-                count_all += raw.count_class
-                count_all_ill += raw.count_ill
-                if raw.name_class not in classes_list:
-                    classes_list[raw.name_class] = []
-                classes_list[raw.name_class].append({
-                    'id': count_id,
-                    'man_class': raw.man_class,
-                    'count_ill': raw.count_ill,
-                    'count_class': raw.count_class,
-                    'proc_ill': raw.proc_ill,
-                    'closed': raw.closed,
-                    'date_closed': raw.date_closed,
-                    'date_open': raw.date_open,
-                    'date': raw.date
-                })
+            count = 1
+            for raw in row:
+                if len(raw.name_class) == 2:
+                    count_all += raw.count_class
+                    count_all_ill += raw.count_ill
+                    if raw.name_class not in classes_list:
+                        classes_list[raw.name_class] = []
+                    classes_list[raw.name_class].append({
+                        'id': count,
+                        'man_class': raw.man_class,
+                        'count_ill': raw.count_ill,
+                        'count_class': raw.count_class,
+                        'proc_ill': raw.proc_ill,
+                        'closed': raw.closed,
+                        'date_closed': raw.date_closed,
+                        'date_open': raw.date_open,
+                        'date': raw.date
+                    })
+                    count += 1
+            for count_id, raw in enumerate(row, start=count):
+                if len(raw.name_class) == 3:
+                    count_all += raw.count_class
+                    count_all_ill += raw.count_ill
+                    if raw.name_class not in classes_list:
+                        classes_list[raw.name_class] = []
+                    classes_list[raw.name_class].append({
+                        'id': count_id,
+                        'man_class': raw.man_class,
+                        'count_ill': raw.count_ill,
+                        'count_class': raw.count_class,
+                        'proc_ill': raw.proc_ill,
+                        'closed': raw.closed,
+                        'date_closed': raw.date_closed,
+                        'date_open': raw.date_open,
+                        'date': raw.date
+                    })
     except Exception as e:
         logger.error(e)
 
     proc_all = 0 if count_all_ill == 0 else round(count_all_ill * 100 / count_all)
-
+    print(classes_list)
     send_status = False
     try:
         sending_mail_data = await DataSendCRUD.get_sends_status_by_from_date(session=session, day=current_date)
