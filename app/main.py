@@ -22,6 +22,10 @@ from app.db import SessionDep
 from app.crud.crud import ClassCRUD, DataSendCRUD
 from app.scheduler.datasend import add_datasend
 from scheduler.datasend import send_datasend
+from app.schemas.dishes import DishPydanticIn, DishPydanticTitle, DishPydanticEdit
+from app.schemas.menus import MenuPydanticListIn, MenuPydantic, MenuPydanticEdit
+from app.schemas.classes import ClassPydanticIn, ClassPydanticOne, ClassDataPydanticAdd, ClassDataPydanticSend, \
+    ClassDataPydantic
 
 scheduler = AsyncIOScheduler()
 
@@ -69,95 +73,6 @@ app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
-
-
-class DishPydanticIn(BaseModel):
-    title: str
-    recipe: int
-    out_gramm: int
-    price: float
-    calories: float
-    protein: float
-    fats: float
-    carb: float
-    section: str
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
-
-class DishPydanticEdit(BaseModel):
-    id: int
-
-class DishPydanticTitle(BaseModel):
-    title: str
-
-class MenuPydantic(BaseModel):
-    date_menu: date
-    type_menu: str
-    category_menu: str
-    dish_id: int
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
-
-class MenuPydanticListIn(BaseModel):
-    date_menu: date
-    type_menu: str
-    category_menu: str
-    dishs_ids: Optional[List[int]] = None
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
-
-class MenuPydanticEdit(BaseModel):
-    id: int
-
-
-class ClassPydanticIn(BaseModel):
-    name_class: str
-    man_class: str
-    count_class: int
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
-
-class ClassPydanticOne(BaseModel):
-    name_class: str
-
-
-class ClassDataPydanticSend(BaseModel):
-    name_class: str
-    count_ill: int
-    closed: bool
-    count_day: int
-    date: date
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
-
-class ClassDataPydantic(BaseModel):
-    count_ill: int
-    proc_ill: int
-    closed: bool
-    date_closed: date | None
-    date_open: date | None
-    date: date
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
-
-
-class ClassDataPydanticAdd(BaseModel):
-    name_class: str
-    man_class: str
-    count_class: int
-    count_ill: int
-    proc_ill: int
-    closed: bool
-    date_closed: date | None
-    date_open: date | None
-    date: date
-
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 
 @app.get("/", response_class=HTMLResponse)
