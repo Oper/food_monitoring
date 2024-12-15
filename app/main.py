@@ -1,3 +1,4 @@
+import os.path
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
 from typing import Annotated, Optional, List
@@ -497,9 +498,18 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['H20'] = dish.protein
                     sheet['I20'] = dish.fats
                     sheet['J20'] = dish.carb
-
-    wb.save(result_filename)
-    return FileResponse(path=result_filename, filename=result_filename, media_type='multipart/form-data')
+    try:
+        if os.path.exists('tmp'):
+            wb.save('tmp/' + result_filename)
+            logger.info('Создаем файл в папке - tmp')
+        else:
+            os.mkdir('tmp')
+            logger.info('Создали папку, т.к. ее нет')
+            wb.save('tmp/' + result_filename)
+            logger.info('Создаем файл в папке - tmp')
+    except Exception as e:
+        logger.error(e)
+    return FileResponse(path='tmp/' + result_filename, filename=result_filename, media_type='multipart/form-data')
 
 
 @app.get('/monitoring', response_class=HTMLResponse)
