@@ -10,7 +10,7 @@
     <title>{{ title }}</title>
 </head>
 <body>
-<div class="container-md">
+<div class="container-sm">
     <ul class="nav justify-content-end">
         <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
         <li class="nav-item"><a href="../nutritions" class="nav-link px-2 text-body-secondary">Список меню</a></li>
@@ -23,7 +23,7 @@
         {% for c_key, c_value in menu.items() %}
         <h4 class="text-center">{{ c_key }}</h4>
         {% for t_key, t_value in c_value.items() %}
-        <div class="col-6">
+        <div class="col">
             <table class="table table-responsive table-bordered border-dark table-sm caption-top">
                 <caption><strong>{{ t_key }}:</strong></caption>
                 <thead>
