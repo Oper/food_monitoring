@@ -82,7 +82,7 @@ async def send_datasend(session: AsyncSession):
             host = config.HOST_MAIL
             port = config.PORT_MAIL
 
-            smtp = aiosmtplib.SMTP(hostname=host, port=port, start_tls=False, use_tls=True)
+            smtp = aiosmtplib.SMTP(hostname=host, port=port, use_tls=True)
 
             if not data_send_day.sending:
                 await smtp.connect()
