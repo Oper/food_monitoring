@@ -88,7 +88,7 @@
         type: 'line',
         data: {
             labels: [{% for item in labels %}
-                '{{ item }}'
+                '{{ item }}',
             {% endfor %}],
         datasets: [{
                 data: {{data}},
