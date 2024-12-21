@@ -301,6 +301,10 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
 
     menus = {}
     menus_db = await MenuCRUD.get_all_menus_by_five_day(session=session)
+    out_for_type_menu_breakfast = 0
+    out_for_type_menu_lunch = 0
+    cal_for_type_menu_breakfast = 0
+    cal_for_type_menu_lunch = 0
     if menus_db:
         for _ in menus_db:
             date = _.date_menu.isoformat()
@@ -324,9 +328,19 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
                 'dish_carb': dish.carb,
                 'dish_price': dish.price,
             })
+            if _.category_menu == '1-4 классы' and _.type_menu == 'Завтрак':
+                out_for_type_menu_breakfast += dish.out_gramm
+                cal_for_type_menu_breakfast += dish.calories
+            if _.category_menu == '1-4 классы' and _.type_menu == 'Обед':
+                out_for_type_menu_lunch += dish.out_gramm
+                cal_for_type_menu_lunch += dish.calories
 
     return templates.TemplateResponse(request=request, name='admin_nutritions.html',
-                                      context={'title': title, 'dishes': dishes, 'menus': menus})
+                                      context={'title': title, 'dishes': dishes, 'menus': menus,
+                                               'out_for_breakfast': out_for_type_menu_breakfast,
+                                               'out_for_lunch': out_for_type_menu_lunch,
+                                               'cal_for_breakfast': cal_for_type_menu_breakfast,
+                                               'cal_for_lunch': cal_for_type_menu_lunch})
 
 
 @app.get('/login')

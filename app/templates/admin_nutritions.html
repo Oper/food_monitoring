@@ -137,11 +137,72 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
+
+                            {% if c_key == "1-4 классы" and t_key == "Завтрак" %}
+                                <table class="table table-striped table-sm table-bordered caption-top table-responsive-sm">
+                                    <thead class="">
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">Объем</th>
+                                            <th scope="col">Калорийность</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Соответствует норме:</td>
+                                            {% if out_for_breakfast >= 500 %}
+                                                <td class="table-success">{{out_for_breakfast}}</td>
+                                            {% else %}
+                                                <td class="table-danger">{{out_for_breakfast}}</td>
+                                            {% endif %}
+                                            {% if cal_for_breakfast >= 470 %}
+                                                <td class="table-success">{{cal_for_breakfast}}</td>
+                                            {% else %}
+                                                <td class="table-danger">{{cal_for_breakfast}}</td>
+                                            {% endif %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            {% elif c_key == "1-4 классы" and t_key == "Обед" %}
+                                <table class="table table-striped table-sm table-bordered caption-top table-responsive-sm">
+                                    <thead class="">
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">Объем</th>
+                                            <th scope="col">Калорийность</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Соответствует норме:</td>
+                                            {% if out_for_lunch >= 700 %}
+                                                <td class="table-success">{{out_for_lunch}}</td>
+                                            {% else %}
+                                                <td class="table-danger">{{out_for_lunch}}</td>
+                                            {% endif %}
+                                            {% if cal_for_lunch >= 705 %}
+                                                <td class="table-success">{{cal_for_lunch}}</td>
+                                            {% else %}
+                                                <td class="table-danger">{{cal_for_lunch}}</td>
+                                            {% endif %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            {% endif %}
+
                         </div>
+                            {% if c_key == "1-4 классы" and t_key == "Завтрак" %}
+                                <div>
+                                    <a class="btn btn-primary" href="/download/{{ d_key }}">Скачать меню для портала</a>
+                                </div>
+
+                            {% endif %}
                         {% endfor %}
-                    </div>
+                    </div><br>
                     {% endfor %}
-                    <a class="btn btn-primary" href="/download/{{ d_key }}">Скачать меню для портала</a>
+
                 </div>
             </div>
         </div>
