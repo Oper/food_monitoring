@@ -139,68 +139,69 @@
                             </table>
                             {% for r_key, r_value in result.items() %}
                             {% if c_key == "1-4 классы" and t_key == "Завтрак" and r_key == d_key %}
-                                <table class="table table-striped table-sm table-bordered caption-top table-responsive-sm">
-                                    <thead class="">
-                                        <tr>
-                                            <th scope="col"></th>
-                                            <th scope="col">Объем</th>
-                                            <th scope="col">Калорийность</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Соответствует норме:</td>
-                                            {% if r_value['out_breakfast'] >= 500 %}
-                                                <td class="table-success">{{r_value['out_breakfast']}}</td>
-                                            {% else %}
-                                                <td class="table-danger">{{r_value['out_breakfast']}}</td>
-                                            {% endif %}
-                                            {% if r_value['cal_breakfast'] >= 470 %}
-                                                <td class="table-success">{{r_value['cal_breakfast']}}</td>
-                                            {% else %}
-                                                <td class="table-danger">{{r_value['cal_breakfast']}}</td>
-                                            {% endif %}
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <table class="table table-striped table-sm table-bordered caption-top table-responsive-sm">
+                                <thead class="">
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Объем</th>
+                                    <th scope="col">Калорийность</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Соответствует норме:</td>
+                                    {% if r_value['out_breakfast'] >= 500 %}
+                                    <td class="table-success">{{r_value['out_breakfast']}}</td>
+                                    {% else %}
+                                    <td class="table-danger">{{r_value['out_breakfast']}}</td>
+                                    {% endif %}
+                                    {% if r_value['cal_breakfast'] >= 470 %}
+                                    <td class="table-success">{{r_value['cal_breakfast']}}</td>
+                                    {% else %}
+                                    <td class="table-danger">{{r_value['cal_breakfast']}}</td>
+                                    {% endif %}
+                                </tr>
+                                </tbody>
+                            </table>
 
                             {% elif c_key == "1-4 классы" and t_key == "Обед" and r_key == d_key %}
-                                <table class="table table-striped table-sm table-bordered caption-top table-responsive-sm">
-                                    <thead class="">
-                                        <tr>
-                                            <th scope="col"></th>
-                                            <th scope="col">Объем</th>
-                                            <th scope="col">Калорийность</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Соответствует норме:</td>
-                                            {% if r_value['out_lunch'] >= 700 %}
-                                                <td class="table-success">{{r_value['out_lunch']}}</td>
-                                            {% else %}
-                                                <td class="table-danger">{{r_value['out_lunch']}}</td>
-                                            {% endif %}
-                                            {% if r_value['cal_lunch'] >= 705 %}
-                                                <td class="table-success">{{r_value['cal_lunch']}}</td>
-                                            {% else %}
-                                                <td class="table-danger">{{r_value['cal_lunch']}}</td>
-                                            {% endif %}
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <table class="table table-striped table-sm table-bordered caption-top table-responsive-sm">
+                                <thead class="">
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Объем</th>
+                                    <th scope="col">Калорийность</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Соответствует норме:</td>
+                                    {% if r_value['out_lunch'] >= 700 %}
+                                    <td class="table-success">{{r_value['out_lunch']}}</td>
+                                    {% else %}
+                                    <td class="table-danger">{{r_value['out_lunch']}}</td>
+                                    {% endif %}
+                                    {% if r_value['cal_lunch'] >= 705 %}
+                                    <td class="table-success">{{r_value['cal_lunch']}}</td>
+                                    {% else %}
+                                    <td class="table-danger">{{r_value['cal_lunch']}}</td>
+                                    {% endif %}
+                                </tr>
+                                </tbody>
+                            </table>
 
                             {% endif %}
                             {% endfor %}
                         </div>
-                            {% if c_key == "1-4 классы" and t_key == "Завтрак" %}
-                                <div>
-                                    <a class="btn btn-primary" href="/download/{{ d_key }}">Скачать меню для портала</a>
-                                </div>
+                        {% if c_key == "1-4 классы" and t_key == "Завтрак" %}
+                        <div>
+                            <a class="btn btn-primary" href="/download/{{ d_key }}">Скачать меню для портала</a>
+                        </div>
 
-                            {% endif %}
+                        {% endif %}
                         {% endfor %}
-                    </div><br>
+                    </div>
+                    <br>
                     {% endfor %}
 
                 </div>
@@ -401,20 +402,20 @@
 <style>
 
 
-[data-role="dynamic-fields"] > .form-inline + .form-inline {
-    margin-top: 0.5em;
-}
+    [data-role="dynamic-fields"] > .form-inline + .form-inline {
+        margin-top: 0.5em;
+    }
 
-[data-role="dynamic-fields"] > .form-inline [data-role="add"] {
-    display: none;
-}
+    [data-role="dynamic-fields"] > .form-inline [data-role="add"] {
+        display: none;
+    }
 
-[data-role="dynamic-fields"] > .form-inline:last-child [data-role="add"] {
-    display: inline-block;
-}
+    [data-role="dynamic-fields"] > .form-inline:last-child [data-role="add"] {
+        display: inline-block;
+    }
 
-[data-role="dynamic-fields"] > .form-inline:last-child [data-role="remove"] {
-    display: none;
-}
+    [data-role="dynamic-fields"] > .form-inline:last-child [data-role="remove"] {
+        display: none;
+    }
 </style>
 </html>

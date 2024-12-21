@@ -341,7 +341,8 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
                 result_menus[date]['out_lunch'] = result_menus[date].get('out_lunch', 0) + dish.out_gramm
 
     return templates.TemplateResponse(request=request, name='admin_nutritions.html',
-                                      context={'title': title, 'dishes': dishes, 'menus': menus, 'result':result_menus})
+                                      context={'title': title, 'dishes': dishes, 'menus': menus,
+                                               'result': result_menus})
 
 
 @app.get('/login')
