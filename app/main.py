@@ -1,7 +1,7 @@
 import os.path
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
-from typing import Annotated, Optional, List
+from typing import Annotated
 from venv import logger
 
 from fastapi import FastAPI, Request, Form, Depends
@@ -9,7 +9,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from openpyxl import load_workbook
-from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import RedirectResponse, FileResponse
