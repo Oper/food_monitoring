@@ -40,7 +40,7 @@
                     <td>{{ item.dish_name }}</td>
                     <td>{{ item.out_gramm }}</td>
                     <td>{{ item.calories }}</td>
-                    <td>{{ item.price }}</td>
+                    <td>{{ item.price if c_key == "1-4 классы" and t_key == "Завтрак" or c_key == "Продажа" else 0.0 }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
