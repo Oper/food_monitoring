@@ -15,6 +15,7 @@ from app.schemas.datasend import DataSendPydanticDay, DataSendPydanticUpdate, Da
 from app.crud.crud import DataSendCRUD
 from app.crud.crud import ClassCRUD
 from app.db import session_manager
+from app.schemas.classes import ClassPydanticOne, ClassDataPydanticOpen
 
 
 @session_manager.connection()
@@ -94,5 +95,21 @@ async def send_datasend(session: AsyncSession):
                 logger.info(f'Письмо на {current_date.isoformat()} отправлено!')
     except socket.error as e:
         logger.error(e)
+    except Exception as e:
+        logger.error(e)
+
+
+@session_manager.connection()
+async def update_class(session: AsyncSession):
+    current_date = date.today()
+    try:
+        all_classes = await ClassCRUD.get_all(session=session)
+        if all_classes:
+            for cur_class in all_classes:
+                if cur_class.date_open == current_date:
+                    await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=cur_class.name_class),
+                                           values=ClassDataPydanticOpen(closed=False,
+                                                                        date_closed=None,
+                                                                        date_open=None))
     except Exception as e:
         logger.error(e)

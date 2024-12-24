@@ -47,3 +47,8 @@ class ClassDataPydanticAdd(BaseModel):
     date: date
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+
+class ClassDataPydanticOpen(BaseModel):
+    closed: bool
+    date_closed: date | None
+    date_open: date | None
