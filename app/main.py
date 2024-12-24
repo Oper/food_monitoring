@@ -21,7 +21,7 @@ from app.auth.router import router as router_auth
 from app.db import SessionDep
 from app.crud.crud import ClassCRUD, DataSendCRUD
 from app.scheduler.datasend import add_datasend
-from scheduler.datasend import send_datasend
+from scheduler.datasend import send_datasend, update_class
 from app.schemas.dishes import DishPydanticIn, DishPydanticTitle, DishPydanticEdit
 from app.schemas.menus import MenuPydanticListIn, MenuPydantic, MenuPydanticEdit
 from app.schemas.classes import ClassPydanticIn, ClassPydanticOne, ClassDataPydanticAdd, ClassDataPydanticSend, \
@@ -56,6 +56,13 @@ async def lifespan(app: FastAPI):
             hour='9',
             minute='50-59/1',
             id='send_datasend',
+            replace_existing=True
+        )
+        scheduler.add_job(
+            update_class,
+            'cron',
+            hour='20',
+            id='update_class',
             replace_existing=True
         )
         scheduler.start()
