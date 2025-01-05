@@ -104,7 +104,7 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
                                                'result': result_menus})
 
 
-@router.get('/{menu}', response_class=HTMLResponse)
+@router.get('/{date_menu}', response_class=HTMLResponse)
 async def menu_in_date(date_menu: str, request: Request, session: AsyncSession = SessionDep):
     title = 'Меню на ' + str(date_menu)
     current_menu = datetime.strptime(date_menu, "%Y-%m-%d").date()
@@ -130,7 +130,8 @@ async def menu_in_date(date_menu: str, request: Request, session: AsyncSession =
 
 
 @router.post('/send_dish/')
-async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()], session: AsyncSession = SessionDep):
+async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()],
+                      user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     try:
         dish = await DishCRUD.get_dish_by_name(session=session, dish_name=data.title)
         if dish:
@@ -149,6 +150,7 @@ async def create_dish(request: Request, data: Annotated[DishPydanticIn, Form()],
 
 @router.post('/send_menu/')
 async def create_menu(request: Request, data: Annotated[MenuPydanticListIn, Form()],
+                      user_data: User = Depends(get_current_user),
                       session: AsyncSession = SessionDep):
     menu_dict = data.model_dump()
     try:
@@ -165,7 +167,8 @@ async def create_menu(request: Request, data: Annotated[MenuPydanticListIn, Form
 
 
 @router.post('/del_dish/')
-async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()], session: AsyncSession = SessionDep):
+async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()],
+                      user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     id_dish = data.id
     try:
         await DishCRUD.delete(session=session, filters=DishPydanticEdit(id=id_dish))
@@ -176,7 +179,8 @@ async def delete_dish(request: Request, data: Annotated[DishPydanticEdit, Form()
 
 
 @router.post('/del_menu/')
-async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()], session: AsyncSession = SessionDep):
+async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()],
+                      user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     id_menu = data.id
     try:
         await MenuCRUD.delete(session=session, filters=MenuPydanticEdit(id=id_menu))
@@ -186,7 +190,7 @@ async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
-@router.get('/download/{menu}')
+@router.get('/download/{date_menu}')
 async def get_file_menu_for_monitoring(date_menu: str, session: AsyncSession = SessionDep):
     wb = load_workbook(filename='templates/GGGG-MM-DD-sm.xlsx')
     sheet = wb['1']

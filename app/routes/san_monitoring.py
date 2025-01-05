@@ -31,43 +31,43 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     count_all = 0
 
     try:
-        row = await ClassCRUD.get_all(session=session)
-        if row:
+        all_classes = await ClassCRUD.get_all(session=session)
+        if all_classes:
             count = 1
-            for raw in row:
-                if len(raw.name_class) == 2:
-                    count_all += raw.count_class
-                    count_all_ill += raw.count_ill
-                    if raw.name_class not in classes_list:
-                        classes_list[raw.name_class] = []
-                    classes_list[raw.name_class].append({
+            for _class in all_classes:
+                if len(_class.name_class) == 2:
+                    count_all += _class.count_class
+                    count_all_ill += _class.count_ill
+                    if _class.name_class not in classes_list:
+                        classes_list[_class.name_class] = []
+                    classes_list[_class.name_class].append({
                         'id': count,
-                        'man_class': raw.man_class,
-                        'count_ill': raw.count_ill,
-                        'count_class': raw.count_class,
-                        'proc_ill': raw.proc_ill,
-                        'closed': raw.closed,
-                        'date_closed': raw.date_closed,
-                        'date_open': raw.date_open,
-                        'date': raw.date
+                        'man_class': _class.man_class,
+                        'count_ill': _class.count_ill,
+                        'count_class': _class.count_class,
+                        'proc_ill': _class.proc_ill,
+                        'closed': _class.closed,
+                        'date_closed': _class.date_closed,
+                        'date_open': _class.date_open,
+                        'date': _class.date
                     })
                     count += 1
-            for count_id, raw in enumerate(row, start=count):
-                if len(raw.name_class) == 3:
-                    count_all += raw.count_class
-                    count_all_ill += raw.count_ill
-                    if raw.name_class not in classes_list:
-                        classes_list[raw.name_class] = []
-                    classes_list[raw.name_class].append({
+            for count_id, _class in enumerate(all_classes, start=count):
+                if len(_class.name_class) == 3:
+                    count_all += _class.count_class
+                    count_all_ill += _class.count_ill
+                    if _class.name_class not in classes_list:
+                        classes_list[_class.name_class] = []
+                    classes_list[_class.name_class].append({
                         'id': count_id,
-                        'man_class': raw.man_class,
-                        'count_ill': raw.count_ill,
-                        'count_class': raw.count_class,
-                        'proc_ill': raw.proc_ill,
-                        'closed': raw.closed,
-                        'date_closed': raw.date_closed,
-                        'date_open': raw.date_open,
-                        'date': raw.date
+                        'man_class': _class.man_class,
+                        'count_ill': _class.count_ill,
+                        'count_class': _class.count_class,
+                        'proc_ill': _class.proc_ill,
+                        'closed': _class.closed,
+                        'date_closed': _class.date_closed,
+                        'date_open': _class.date_open,
+                        'date': _class.date
                     })
     except Exception as e:
         logger.error(e)
@@ -90,7 +90,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
                                                'proc_all': proc_all, 'send_status': status, 'classes': classes_list})
 
 @router.post('/create_class/')
-async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()], session: AsyncSession = SessionDep):
+async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()], user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     name_class = data.name_class
     man_class = data.man_class
     count_class = data.count_class
@@ -119,7 +119,7 @@ async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()
 
 
 @router.post('/del_class/')
-async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()], session: AsyncSession = SessionDep):
+async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()], user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     name_class = data.name_class
     try:
         await ClassCRUD.delete(session=session, filters=ClassPydanticOne(name_class=name_class))
@@ -196,21 +196,21 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
     classes_list = {}
 
     try:
-        classes = await ClassCRUD.get_all(session=session)
-        if classes:
-            for count_id, raw in enumerate(classes, start=1):
-                if raw.name_class not in classes_list:
-                    classes_list[raw.name_class] = []
-                classes_list[raw.name_class].append({
+        all_classes = await ClassCRUD.get_all(session=session)
+        if all_classes:
+            for count_id, _class in enumerate(all_classes, start=1):
+                if _class.name_class not in classes_list:
+                    classes_list[_class.name_class] = []
+                classes_list[_class.name_class].append({
                     'id': count_id,
-                    'man_class': raw.man_class,
-                    'count_ill': raw.count_ill,
-                    'count_class': raw.count_class,
-                    'proc_ill': raw.proc_ill,
-                    'closed': raw.closed,
-                    'date_closed': raw.date_closed,
-                    'date_open': raw.date_open,
-                    'date': raw.date
+                    'man_class': _class.man_class,
+                    'count_ill': _class.count_ill,
+                    'count_class': _class.count_class,
+                    'proc_ill': _class.proc_ill,
+                    'closed': _class.closed,
+                    'date_closed': _class.date_closed,
+                    'date_open': _class.date_open,
+                    'date': _class.date
                 })
     except Exception as e:
         logger.error(e)
@@ -226,17 +226,18 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
     labels = []
     data = []
     try:
-        tmp = await DataSendCRUD.get_last_by_30(session=session)
-        for d in tmp:
-            labels.append(d.date_send.isoformat())
-            data.append(d.count_all_ill)
-        for count, i in enumerate(tmp, start=1):
-            if i.date_send not in json_data:
-                json_data[i.date_send] = []
-            json_data[i.date_send].append({
+        datasend_by_30 = await DataSendCRUD.get_last_by_30(session=session)
+        for datasend in datasend_by_30:
+            labels.append(datasend.date_send.isoformat())
+            data.append(datasend.count_all_ill)
+
+        for count, datasend in enumerate(datasend_by_30, start=1):
+            if datasend.date_send not in json_data:
+                json_data[datasend.date_send] = []
+            json_data[datasend.date_send].append({
                 'id': count,
-                'count_all_ill': i.count_all_ill,
-                'count_class_closed': i.count_class_closed
+                'count_all_ill': datasend.count_all_ill,
+                'count_class_closed': datasend.count_class_closed
             })
     except Exception as e:
         logger.error(e)
