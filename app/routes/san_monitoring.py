@@ -1,0 +1,245 @@
+from datetime import date, timedelta
+from typing import Annotated
+from venv import logger
+
+from fastapi.routing import APIRouter
+from fastapi import Request, Form, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
+from starlette.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+
+from app.db import SessionDep
+from app.crud.crud import ClassCRUD, DataSendCRUD
+from app.schemas.classes import ClassPydanticIn, ClassPydanticOne, ClassDataPydanticAdd, ClassDataPydanticSend, \
+    ClassDataPydantic
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+
+templates = Jinja2Templates(directory="templates")
+
+router = APIRouter(prefix='/monitoring', tags=['sanmon'])
+
+@router.get('/', response_class=HTMLResponse)
+async def monitoring(request: Request, session: AsyncSession = SessionDep):
+    title = 'Санитарно-эпидемиологическая обстановка в Школе'
+
+    current_date = date.today()
+    classes_list = {}
+
+    count_all_ill = 0
+    count_all = 0
+
+    try:
+        row = await ClassCRUD.get_all(session=session)
+        if row:
+            count = 1
+            for raw in row:
+                if len(raw.name_class) == 2:
+                    count_all += raw.count_class
+                    count_all_ill += raw.count_ill
+                    if raw.name_class not in classes_list:
+                        classes_list[raw.name_class] = []
+                    classes_list[raw.name_class].append({
+                        'id': count,
+                        'man_class': raw.man_class,
+                        'count_ill': raw.count_ill,
+                        'count_class': raw.count_class,
+                        'proc_ill': raw.proc_ill,
+                        'closed': raw.closed,
+                        'date_closed': raw.date_closed,
+                        'date_open': raw.date_open,
+                        'date': raw.date
+                    })
+                    count += 1
+            for count_id, raw in enumerate(row, start=count):
+                if len(raw.name_class) == 3:
+                    count_all += raw.count_class
+                    count_all_ill += raw.count_ill
+                    if raw.name_class not in classes_list:
+                        classes_list[raw.name_class] = []
+                    classes_list[raw.name_class].append({
+                        'id': count_id,
+                        'man_class': raw.man_class,
+                        'count_ill': raw.count_ill,
+                        'count_class': raw.count_class,
+                        'proc_ill': raw.proc_ill,
+                        'closed': raw.closed,
+                        'date_closed': raw.date_closed,
+                        'date_open': raw.date_open,
+                        'date': raw.date
+                    })
+    except Exception as e:
+        logger.error(e)
+
+    proc_all = 0 if count_all_ill == 0 else round(count_all_ill * 100 / count_all)
+
+    send_status = False
+    try:
+        sending_mail_data = await DataSendCRUD.get_sends_status_by_from_date(session=session, day=current_date)
+        if sending_mail_data:
+            send_status = sending_mail_data.sending
+    except Exception as e:
+        logger.error(e)
+
+    status = 'Данные на ' + current_date.isoformat() + ' отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
+
+    return templates.TemplateResponse(request=request, name='monitoring.html',
+                                      context={'title': title, 'date_current': current_date,
+                                               'count_all_ill': count_all_ill, 'count_all': count_all,
+                                               'proc_all': proc_all, 'send_status': status, 'classes': classes_list})
+
+@router.post('/create_class/')
+async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()], session: AsyncSession = SessionDep):
+    name_class = data.name_class
+    man_class = data.man_class
+    count_class = data.count_class
+    try:
+        current_class = await ClassCRUD.get_class_by_one(session=session, name_class=name_class)
+        if current_class:
+            values = data.model_dump()
+            await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                   values=ClassPydanticIn(**values))
+        else:
+            await ClassCRUD.add(session=session,
+                                values=ClassDataPydanticAdd(
+                                    name_class=name_class,
+                                    man_class=man_class,
+                                    count_class=count_class,
+                                    count_ill=0,
+                                    proc_ill=0,
+                                    closed=False,
+                                    date_open=None,
+                                    date_closed=None,
+                                    date=date.today()))
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('admin_monitoring').include_query_params(msg="Succesfully created!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post('/del_class/')
+async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()], session: AsyncSession = SessionDep):
+    name_class = data.name_class
+    try:
+        await ClassCRUD.delete(session=session, filters=ClassPydanticOne(name_class=name_class))
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('admin_monitoring').include_query_params(msg="Succesfully deleted!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post('/send_data_class')
+async def send_data_class(request: Request, data: Annotated[ClassDataPydanticSend, Form()],
+                          session: AsyncSession = SessionDep):
+    name_class = data.name_class
+    count_ill = data.count_ill
+    date_send = data.date
+    count_day = data.count_day
+    closed = data.closed
+
+    try:
+        current_class = await ClassCRUD.get_class_by_one(session=session, name_class=name_class)
+        proc_ill = 0 if count_ill == 0 else round(count_ill * 100 / current_class.count_class)
+        if current_class:
+            if current_class.closed and closed:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=closed,
+                                           date=date_send,
+                                           date_open=current_class.date_open,
+                                           date_closed=current_class.date_closed
+                                       ))
+            elif current_class.closed and not closed:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=False,
+                                           date=date_send,
+                                           date_open=None,
+                                           date_closed=None
+                                       ))
+            elif closed and proc_ill > 20:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=True,
+                                           date=date_send,
+                                           date_open=date_send + timedelta(days=count_day),
+                                           date_closed=date_send + timedelta(days=1)
+                                       ))
+            else:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                                       values=ClassDataPydantic(
+                                           count_ill=count_ill,
+                                           proc_ill=proc_ill,
+                                           closed=False,
+                                           date=date_send,
+                                           date_open=None,
+                                           date_closed=None
+                                       ))
+
+    except Exception as e:
+        logger.error(e)
+    redirect_url = request.url_for('monitoring').include_query_params(msg="Succesfully send data!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get('/admin', response_class=HTMLResponse)
+async def admin_monitoring(request: Request, user_data: User = Depends(get_current_user),
+                           session: AsyncSession = SessionDep):
+    title = 'Панель управления классами'
+
+    classes_list = {}
+
+    try:
+        classes = await ClassCRUD.get_all(session=session)
+        if classes:
+            for count_id, raw in enumerate(classes, start=1):
+                if raw.name_class not in classes_list:
+                    classes_list[raw.name_class] = []
+                classes_list[raw.name_class].append({
+                    'id': count_id,
+                    'man_class': raw.man_class,
+                    'count_ill': raw.count_ill,
+                    'count_class': raw.count_class,
+                    'proc_ill': raw.proc_ill,
+                    'closed': raw.closed,
+                    'date_closed': raw.date_closed,
+                    'date_open': raw.date_open,
+                    'date': raw.date
+                })
+    except Exception as e:
+        logger.error(e)
+
+    return templates.TemplateResponse(request=request, name='admin_monitoring.html',
+                                      context={'title': title, 'classes': classes_list})
+
+
+@router.get('/analysis', response_class=HTMLResponse)
+async def analysis(request: Request, session: AsyncSession = SessionDep):
+    title = 'Анализ заболеваемости'
+    json_data = {}
+    labels = []
+    data = []
+    try:
+        tmp = await DataSendCRUD.get_last_by_30(session=session)
+        for d in tmp:
+            labels.append(d.date_send.isoformat())
+            data.append(d.count_all_ill)
+        for count, i in enumerate(tmp, start=1):
+            if i.date_send not in json_data:
+                json_data[i.date_send] = []
+            json_data[i.date_send].append({
+                'id': count,
+                'count_all_ill': i.count_all_ill,
+                'count_class_closed': i.count_class_closed
+            })
+    except Exception as e:
+        logger.error(e)
+
+    return templates.TemplateResponse(request=request, name='analysis.html',
+                                      context={'title': title, 'json_data': json_data, 'labels': labels, 'data': data})

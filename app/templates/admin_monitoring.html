@@ -36,7 +36,7 @@
                 <td class="text-center">{{ item.count_ill }}</td>
                 <td class="text-center">{{ item.count_class }}</td>
                 <td class="text-center">
-                    <form action="/del_class" method="post">
+                    <form action="/monitoring/del_class/" method="post">
                         <input type="text" class="d-none" name="name_class" value="{{ j_key }}">
                         <button type="submit" class="btn btn-danger">Удалить</button>
                     </form>
@@ -65,7 +65,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="/create_class" class="row g-3" method="post">
+                <form action="/monitoring/create_class/" class="row g-3" method="post">
                     <div class="row g-2">
                         <div class="col">
                             <div class="input-group input-group-sm mb-3">
@@ -95,7 +95,7 @@
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
             <li class="nav-item"><a href="../monitoring" class="nav-link px-2 text-body-secondary">Мониторинг</a></li>
-            <li class="nav-item"><a href="../admin-monitoring" class="nav-link px-2 text-body-secondary">Панель управления</a></li>
+            <li class="nav-item"><a href="../monitoring/admin" class="nav-link px-2 text-body-secondary">Панель управления</a></li>
             <li class="nav-item"><a href="/auth/logout" class="nav-link px-2 text-body-secondary">Выход</a></li>
         </ul>
         <p class="text-center text-body-secondary">© 2024 МБОУ "Средняя общеобразовательная школа №1" г.Емвы</p>
