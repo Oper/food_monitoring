@@ -13,8 +13,8 @@
 <div class="container-md"><br>
     <ul class="nav justify-content-end">
         <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
-        <li class="nav-item"><a href="../analysis" class="nav-link px-2 text-body-secondary">Анализ
-                заболеваемости</a></li>
+        <li class="nav-item"><a href="../monitoring/analysis" class="nav-link px-2 text-body-secondary">Анализ
+            заболеваемости</a></li>
         <li class="nav-item"><a href="../nutritions" class="nav-link px-2 text-body-secondary">Питание</a>
         </li>
     </ul>
@@ -82,7 +82,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/send_data_class" class="row g-3 align-items-center" method="post">
+                    <form action="/monitoring/send_data_class" class="row g-3 align-items-center" method="post">
                         <div class="row g-1 align-items-center">
                             <div class="col">
                                 <div class="form-floating">
@@ -117,8 +117,11 @@
                                 <button type="submit" class="btn btn-primary align-middle">Отправить</button>
                             </div>
                             <div class="align-items-center">
-                                <input type="number" aria-label="Количество дней" class="form-control"
-                                       name="count_day" value="7">
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text" id="count_days">Количество дней</span>
+                                    <input type="number" class="form-control" id="basic-url"
+                                           aria-describedby="count_days" value="7" name="count_day">
+                                </div>
                                 <input type="radio" id="opens_off" name="closed" value="0">
                                 <label for="opens_off">Не закрывать</label>
                                 <input class="d-none" type="radio" id="opens_on" name="closed" value="1" checked>
@@ -162,9 +165,9 @@
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
             <li class="nav-item"><a href="../monitoring" class="nav-link px-2 text-body-secondary">Мониторинг</a></li>
-            <li class="nav-item"><a href="../admin-monitoring" class="nav-link px-2 text-body-secondary">Панель
+            <li class="nav-item"><a href="../monitoring/admin" class="nav-link px-2 text-body-secondary">Панель
                 управления</a></li>
-            <li class="nav-item"><a href="../analysis" class="nav-link px-2 text-body-secondary">Анализ
+            <li class="nav-item"><a href="../monitoring/analysis" class="nav-link px-2 text-body-secondary">Анализ
                 заболеваемости</a></li>
         </ul>
         <p class="text-center text-body-secondary">2024 © МБОУ "Средняя общеобразовательная школа №1" г.Емвы</p>
