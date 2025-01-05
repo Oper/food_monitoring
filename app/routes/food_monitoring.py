@@ -27,10 +27,10 @@ async def nutritions(request: Request, session: AsyncSession = SessionDep):
     menu_list = []
     current_date = date.today().isoformat()
     try:
-        row = await MenuCRUD.get_all(session=session)
-        if row:
-            for _ in row:
-                cur_menu = str(_.date_menu)
+        all_menus = await MenuCRUD.get_all(session=session)
+        if all_menus:
+            for menu in all_menus:
+                cur_menu = str(menu.date_menu)
                 if cur_menu not in menu_list:
                     menu_list.append(cur_menu)
         menu_list.sort()
@@ -67,20 +67,20 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
     result_menus = {}
 
     if menus_db:
-        for _ in menus_db:
-            date = _.date_menu.isoformat()
+        for menu in menus_db:
+            date = menu.date_menu.isoformat()
             if date not in result_menus:
                 result_menus[date] = {}
             if date not in menus:
                 menus[date] = {}
-            if _.category_menu not in menus[date]:
-                menus[date][_.category_menu] = {}
-            if _.type_menu not in menus[date][_.category_menu]:
-                menus[date][_.category_menu][_.type_menu] = []
-            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=_.dish_id)
+            if menu.category_menu not in menus[date]:
+                menus[date][menu.category_menu] = {}
+            if menu.type_menu not in menus[date][menu.category_menu]:
+                menus[date][menu.category_menu][menu.type_menu] = []
+            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=menu.dish_id)
 
-            menus[date][_.category_menu][_.type_menu].append({
-                'menu_id': _.id,
+            menus[date][menu.category_menu][menu.type_menu].append({
+                'menu_id': menu.id,
                 'dish_id': dish.id,
                 'dish_title': dish.title,
                 'dish_out': dish.out_gramm,
@@ -91,11 +91,11 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
                 'dish_carb': dish.carb,
                 'dish_price': dish.price,
             })
-            if _.category_menu == '1-4 классы' and _.type_menu == 'Завтрак':
+            if menu.category_menu == '1-4 классы' and menu.type_menu == 'Завтрак':
                 result_menus[date]['cal_breakfast'] = result_menus[date].get('cal_breakfast', 0) + dish.calories
                 result_menus[date]['out_breakfast'] = result_menus[date].get('out_breakfast', 0) + dish.out_gramm
 
-            if _.category_menu == '1-4 классы' and _.type_menu == 'Обед':
+            if menu.category_menu == '1-4 классы' and menu.type_menu == 'Обед':
                 result_menus[date]['cal_lunch'] = result_menus[date].get('cal_lunch', 0) + dish.calories
                 result_menus[date]['out_lunch'] = result_menus[date].get('out_lunch', 0) + dish.out_gramm
 
@@ -105,20 +105,20 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
 
 
 @router.get('/{menu}', response_class=HTMLResponse)
-async def menu_in_date(menu: str, request: Request, session: AsyncSession = SessionDep):
-    title = 'Меню на ' + str(menu)
-    current_menu = datetime.strptime(menu, "%Y-%m-%d").date()
+async def menu_in_date(date_menu: str, request: Request, session: AsyncSession = SessionDep):
+    title = 'Меню на ' + str(date_menu)
+    current_menu = datetime.strptime(date_menu, "%Y-%m-%d").date()
     menus_db_by_day = await MenuCRUD.get_all_menus_by_one_day(session=session, day=current_menu)
     menu_today = {}
     if menus_db_by_day:
-        for _ in menus_db_by_day:
-            if _.category_menu not in menu_today:
-                menu_today[_.category_menu] = {}
-            if _.type_menu not in menu_today[_.category_menu]:
-                menu_today[_.category_menu][_.type_menu] = []
-            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=_.dish_id)
+        for menu in menus_db_by_day:
+            if menu.category_menu not in menu_today:
+                menu_today[menu.category_menu] = {}
+            if menu.type_menu not in menu_today[menu.category_menu]:
+                menu_today[menu.category_menu][menu.type_menu] = []
+            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=menu.dish_id)
             if dish:
-                menu_today[_.category_menu][_.type_menu].append({
+                menu_today[menu.category_menu][menu.type_menu].append({
                     'dish_name': dish.title,
                     'out_gramm': dish.out_gramm,
                     'calories': dish.calories,
@@ -187,17 +187,17 @@ async def delete_menu(request: Request, data: Annotated[MenuPydanticEdit, Form()
 
 
 @router.get('/download/{menu}')
-async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = SessionDep):
+async def get_file_menu_for_monitoring(date_menu: str, session: AsyncSession = SessionDep):
     wb = load_workbook(filename='templates/GGGG-MM-DD-sm.xlsx')
     sheet = wb['1']
-    current_date_menu = datetime.strptime(menu, "%Y-%m-%d").date()
+    current_date_menu = datetime.strptime(date_menu, "%Y-%m-%d").date()
     sheet['J1'] = current_date_menu
-    result_filename = menu + '-sm.xlsx'
+    result_filename = date_menu + '-sm.xlsx'
     menus_db_by_day = await MenuCRUD.get_category_menus_one_day(session=session, day=current_date_menu)
     if menus_db_by_day:
-        for row in menus_db_by_day:
-            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=row.dish_id)
-            if row.type_menu == 'Завтрак':
+        for menu in menus_db_by_day:
+            dish = await DishCRUD.get_dish_by_id(session=session, dish_id=menu.dish_id)
+            if menu.type_menu == 'Завтрак':
                 if dish.section == 'гор.блюдо':
                     if dish.recipe != 0:
                         sheet['C4'] = dish.recipe
@@ -246,7 +246,7 @@ async def get_file_menu_for_monitoring(menu: str, session: AsyncSession = Sessio
                     sheet['H8'] = dish.protein
                     sheet['I8'] = dish.fats
                     sheet['J8'] = dish.carb
-            elif row.type_menu == 'Обед':
+            elif menu.type_menu == 'Обед':
                 if dish.section == 'фрукты':
                     if dish.recipe != 0:
                         sheet['C9'] = dish.recipe
