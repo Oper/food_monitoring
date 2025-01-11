@@ -15,7 +15,7 @@ DATABASE_URL = config.get_link_db('postgresql+asyncpg')
 
 engine = create_async_engine(url=DATABASE_URL)
 
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 str_uniq = Annotated[str, mapped_column(unique=True, nullable=False)]
 
 
@@ -71,7 +71,6 @@ class DatabaseSessionManager:
             logger.exception(f"Ошибка транзакции: {e}")
             raise
 
-
     async def get_transaction_session(self) -> AsyncGenerator[AsyncSession, None]:
         """
         Зависимость для FastAPI, возвращающая сессию с управлением транзакцией.
@@ -87,10 +86,10 @@ class DatabaseSessionManager:
 
         def decorator(method):
             @wraps(method)
-            async def wrapper():
+            async def wrapper(*args, **kwargs):
                 async with self.session_maker() as session:
                     try:
-                        result = await method(session=session)
+                        result = await method(*args, session=session, **kwargs)
                         await session.commit()
                         return result
                     except Exception as e:
@@ -103,7 +102,6 @@ class DatabaseSessionManager:
             return wrapper
 
         return decorator
-
 
     @property
     def transaction_session_dependency(self) -> Callable:

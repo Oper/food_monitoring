@@ -1,3 +1,4 @@
+import datetime
 from contextlib import asynccontextmanager
 from venv import logger
 
@@ -12,6 +13,7 @@ from app.routes.food_monitoring import router as router_food
 from app.routes.san_monitoring import router as router_san
 from app.scheduler.datasend import add_datasend, update_class
 from app.scheduler.datasend import send_datasend
+from app.bot.bot import main as bot_main
 
 
 scheduler = AsyncIOScheduler()
@@ -50,6 +52,13 @@ async def lifespan(app: FastAPI):
             'cron',
             hour='20',
             id='update_class',
+            replace_existing=True
+        )
+        scheduler.add_job(
+            bot_main,
+            'date',
+            next_run_time=datetime.datetime.now(),
+            id='telegram_bot',
             replace_existing=True
         )
         scheduler.start()
