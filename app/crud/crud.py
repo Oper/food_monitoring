@@ -2,7 +2,7 @@ from datetime import timedelta, date
 
 from loguru import logger
 from pydantic import BaseModel
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, desc
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -150,7 +150,7 @@ class DataSendCRUD(BaseCRUD):
 
     @classmethod
     async def get_last_by_30(cls, session: AsyncSession):
-        query = select(cls.model).order_by('created_at').limit(30)
+        query = select(cls.model).order_by(desc('created_at')).limit(30)
         result = await session.execute(query)
         records = result.scalars().all()
         return records
