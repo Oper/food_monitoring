@@ -25,65 +25,7 @@
         </li>
     </ul>
     <h3 class="text-center">{{ title }}</h3>
-    <div class="row">
-        <div class="col">
-            <table class="table table-responsive table-bordered border-dark table-sm caption-top ">
-                <caption><h5>Список блюд:</h5></caption>
-                <thead>
-                <tr class="table-primary">
-                    <td>Номер блюда</td>
-                    <td>Номер в рецептурнике</td>
-                    <td>Наименование блюда</td>
-                    <td>Выход, г</td>
-                    <td>Калорийность, ккал</td>
-                    <td>Белков, г</td>
-                    <td>Жиров, г</td>
-                    <td>Углеводов, г</td>
-                    <td>Стоимость, руб</td>
-                    <td>Действия</td>
-                </tr>
-                </thead>
-                {% for j_key, j_value in dishes.items() %}
-                <tbody class="table-group-divider">
-                {% for item in j_value %}
-                <tr>
-                    <td class="text-center">{{ item.id }}</td>
-                    <td class="text-center">{{ item.recipe }}</td>
-                    <td>{{ j_key }}</td>
-                    <td class="text-center">{{ item.out_gramm }}</td>
-                    <td class="text-center">{{ item.calories }}</td>
-                    <td class="text-center">{{ item.protein }}</td>
-                    <td class="text-center">{{ item.fats }}</td>
-                    <td class="text-center">{{ item.carb }}</td>
-                    <td class="text-center">{{ item.price }}</td>
-                    <td class="text-center">
-                        <div class="btn-group">
-                            <form action="/nutritions/del_dish/" method="post">
-                                <input type="number" class="d-none" name="id" value="{{ item.id }}">
-                                <button type="submit" class="btn btn-outline-secondary">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                         class="bi bi-trash3" viewBox="0 0 16 16">
-                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"></path>
-                                    </svg>
-                                    <span class="visually-hidden">Button</span>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-                {% endfor %}
-            </table>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dishDataModal">
-                    Добавить\редактировать блюдо
-                </button>
-            </div>
-        </div>
-    </div>
-    <h5>Список размещенных меню:</h5>
+        <h5>Список размещенных меню:</h5>
     <div class="accordion" id="accordionFlushExample">
         {% for d_key, d_value in menus.items() %}
         <div class="accordion-item">
@@ -197,7 +139,8 @@
                         {% endfor %}
                         {% if c_key == "1-4 классы" %}
                         <div>
-                            <a class="btn btn-primary" href="/nutritions/download/{{ d_key }}">Скачать меню для портала</a>
+                            <a class="btn btn-primary" href="/nutritions/download/{{ d_key }}">Скачать меню для
+                                портала</a>
                         </div>
 
                         {% endif %}
@@ -209,13 +152,71 @@
             </div>
         </div>
         {% endfor %}
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#menuDataModal">
+                Добавить меню
+            </button>
+        </div>
     </div>
-    <br>
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#menuDataModal">
-            Добавить меню
-        </button>
+    <div class="row">
+        <div class="col">
+            <table class="table table-responsive table-bordered border-dark table-sm caption-top ">
+                <caption><h5>Список блюд:</h5></caption>
+                <thead>
+                <tr class="table-primary">
+                    <td>Номер блюда</td>
+                    <td>Номер в рецептурнике</td>
+                    <td>Наименование блюда</td>
+                    <td>Выход, г</td>
+                    <td>Калорийность, ккал</td>
+                    <td>Белков, г</td>
+                    <td>Жиров, г</td>
+                    <td>Углеводов, г</td>
+                    <td>Стоимость, руб</td>
+                    <td>Действия</td>
+                </tr>
+                </thead>
+                {% for j_key, j_value in dishes.items() %}
+                <tbody class="table-group-divider">
+                {% for item in j_value %}
+                <tr>
+                    <td class="text-center">{{ item.id }}</td>
+                    <td class="text-center">{{ item.recipe }}</td>
+                    <td>{{ j_key }}</td>
+                    <td class="text-center">{{ item.out_gramm }}</td>
+                    <td class="text-center">{{ item.calories }}</td>
+                    <td class="text-center">{{ item.protein }}</td>
+                    <td class="text-center">{{ item.fats }}</td>
+                    <td class="text-center">{{ item.carb }}</td>
+                    <td class="text-center">{{ item.price }}</td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <form action="/nutritions/del_dish/" method="post">
+                                <input type="number" class="d-none" name="id" value="{{ item.id }}">
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-trash3" viewBox="0 0 16 16">
+                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"></path>
+                                    </svg>
+                                    <span class="visually-hidden">Button</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                {% endfor %}
+            </table>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dishDataModal">
+                    Добавить\редактировать блюдо
+                </button>
+            </div>
+        </div>
     </div>
+
 </div>
 <div class="modal fade" id="dishDataModal" tabindex="-1" aria-labelledby="dishModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
