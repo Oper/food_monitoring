@@ -225,11 +225,13 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
     json_data = {}
     labels = []
     data = []
+    data_class_closed = []
     try:
         datasend_by_30 = await DataSendCRUD.get_last_by_30(session=session)
         for datasend in datasend_by_30:
             labels.append(datasend.date_send.isoformat())
             data.append(datasend.count_all_ill)
+            data_class_closed.append(datasend.count_class_closed)
 
         for count, datasend in enumerate(datasend_by_30, start=1):
             if datasend.date_send not in json_data:
@@ -243,4 +245,4 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='analysis.html',
-                                      context={'title': title, 'json_data': json_data, 'labels': labels, 'data': data})
+                                      context={'title': title, 'json_data': json_data, 'labels': labels, 'data': data, 'data_class_closed': data_class_closed})

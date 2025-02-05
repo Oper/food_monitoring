@@ -86,13 +86,26 @@
             labels: [{% for item in labels %}
                 '{{ item }}',
             {% endfor %}],
-        datasets: [{
+        datasets: [
+                {
+                label: 'Количество болеющих',
                 data: {{data}},
                 lineTension: 0.3,
                 backgroundColor: 'transparent',
                 borderColor: '#007bff',
                 borderWidth: 4,
-                pointBackgroundColor:'#007bff'}]
+                pointBackgroundColor:'#007bff'
+                },
+                {
+                label: 'Количество закрытых классов',
+                data: {{data_class_closed}},
+                lineTension: 0.3,
+                backgroundColor: 'transparent',
+                borderColor: '#e61111',
+                borderWidth: 4,
+                pointBackgroundColor:'#e61111'
+                }
+                ]
         },
         options: {
             plugins: {
