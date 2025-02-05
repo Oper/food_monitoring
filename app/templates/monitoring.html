@@ -82,20 +82,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/monitoring/send_data_class" class="row g-3 align-items-center" method="post">
-                        <div class="row g-1 align-items-center">
-                            <div class="col">
-                                <div class="form-floating">
+                    <form action="/monitoring/send_data_class" class="row gy-2 gx-3" method="post">
+                        <div class="col-sm-6">
+                            <div class="form-floating">
                                     <select class="form-select" id="floatingSelectGridNameClass" name="name_class">
                                         {% for j_key, j_value in classes.items() %}
                                         <option>{{ j_key }}</option>
                                         {% endfor %}
                                     </select>
                                     <label for="floatingSelectGridNameClass">Выбор класса</label>
-                                </div>
                             </div>
-                            <div class="col">
-                                <div class="form-floating">
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating">
                                     <select class="form-select" id="floatingSelectGridCountIll" name="count_ill">
                                         <option>0</option>
                                         <option>1</option>
@@ -110,23 +109,27 @@
                                         <option>10</option>
                                     </select>
                                     <label for="floatingSelectGridCountIll">Число болеющих</label>
-                                </div>
                             </div>
-                            <div class="col text-center">
-                                <input class="d-none" type="date" name="date" value={{ date_current }}>
-                                <button type="submit" class="btn btn-primary align-middle">Отправить</button>
-                            </div>
-                            <div class="align-items-center">
-                                <div class="input-group input-group-sm mb-3">
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group input-group-sm mb-3">
                                     <span class="input-group-text" id="count_days">Количество дней</span>
                                     <input type="number" class="form-control" id="basic-url"
                                            aria-describedby="count_days" value="7" name="count_day">
-                                </div>
-                                <input type="radio" id="opens_off" name="closed" value="0">
-                                <label for="opens_off">Не закрывать</label>
-                                <input class="d-none" type="radio" id="opens_on" name="closed" value="1" checked>
-                                <label class="d-none" for="opens_on">Закрыть</label>
                             </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check">
+                                        <input class="form-check-input" type="radio" id="opens_off" name="closed"
+                                               value="0">
+                                        <label  class="form-check-label" for="opens_off">Не закрывать</label>
+                                        <input class="d-none" type="radio" id="opens_on" name="closed" value="1"
+                                               checked>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                                <input class="d-none" type="date" name="date" value={{ date_current }}>
+                                <button type="submit" class="btn btn-primary align-middle">Отправить</button>
                         </div>
                     </form>
                 </div>
