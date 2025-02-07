@@ -20,6 +20,7 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(prefix='/monitoring', tags=['sanmon'])
 
+
 @router.get('/', response_class=HTMLResponse)
 async def monitoring(request: Request, session: AsyncSession = SessionDep):
     title = 'Санитарно-эпидемиологическая обстановка в Школе'
@@ -82,15 +83,19 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     except Exception as e:
         logger.error(e)
 
-    status = 'Данные на ' + current_date.isoformat() + ' отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
+    status = f'Данные на {current_date.isoformat()} отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
+    full_status = 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis border border-success rounded-2' if send_status else 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis border border-danger rounded-2'
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
                                       context={'title': title, 'date_current': current_date,
                                                'count_all_ill': count_all_ill, 'count_all': count_all,
-                                               'proc_all': proc_all, 'send_status': status, 'classes': classes_list})
+                                               'proc_all': proc_all, 'send_status': status, 'classes': classes_list,
+                                               'full_status': full_status})
+
 
 @router.post('/create_class/')
-async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()], user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
+async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()],
+                       user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     name_class = data.name_class
     man_class = data.man_class
     count_class = data.count_class
@@ -119,7 +124,8 @@ async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()
 
 
 @router.post('/del_class/')
-async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()], user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
+async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()],
+                    user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     name_class = data.name_class
     try:
         await ClassCRUD.delete(session=session, filters=ClassPydanticOne(name_class=name_class))
@@ -188,6 +194,7 @@ async def send_data_class(request: Request, data: Annotated[ClassDataPydanticSen
     redirect_url = request.url_for('monitoring').include_query_params(msg="Succesfully send data!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
+
 @router.get('/admin', response_class=HTMLResponse)
 async def admin_monitoring(request: Request, user_data: User = Depends(get_current_user),
                            session: AsyncSession = SessionDep):
@@ -245,4 +252,5 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='analysis.html',
-                                      context={'title': title, 'json_data': json_data, 'labels': labels, 'data': data, 'data_class_closed': data_class_closed})
+                                      context={'title': title, 'json_data': json_data, 'labels': labels, 'data': data,
+                                               'data_class_closed': data_class_closed})
