@@ -84,7 +84,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     status = f'Данные на {current_date.isoformat()} отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
-    full_status = 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis border border-success rounded-2' if send_status else 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis border border-danger rounded-2'
+    full_status = 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-success-subtle border border-success rounded-2' if send_status else 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-secondary-subtle border border-danger rounded-2'
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
                                       context={'title': title, 'date_current': current_date,
