@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from venv import logger
 
-from datetime import date
+from datetime import date, timedelta
 
 import aiosmtplib
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,6 +21,7 @@ from app.schemas.classes import ClassPydanticOne, ClassDataPydanticOpen
 @session_manager.connection()
 async def add_datasend(session: AsyncSession):
     current_date = date.today()
+    tomorrow_date = current_date + timedelta(1)
 
     count_all_ill = 0
     count_all = 0
@@ -34,7 +35,7 @@ async def add_datasend(session: AsyncSession):
             for _ in all_classes:
                 count_all_ill += _.count_ill
                 count_all += _.count_class
-                if _.closed:
+                if _.closed and (_.date_closed > tomorrow_date or _.date_closed is None):
                     count_class_closed += 1
                     count_ill_closed += _.count_ill
                     count_all_closed += _.count_class
