@@ -35,7 +35,7 @@ async def add_datasend(session: AsyncSession):
             for _ in all_classes:
                 count_all_ill += _.count_ill
                 count_all += _.count_class
-                if _.closed and (_.date_closed > tomorrow_date or _.date_closed is None):
+                if _.closed and (_.date_closed < tomorrow_date or _.date_closed is None):
                     count_class_closed += 1
                     count_ill_closed += _.count_ill
                     count_all_closed += _.count_class
