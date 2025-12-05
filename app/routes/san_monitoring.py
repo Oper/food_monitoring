@@ -140,7 +140,7 @@ async def send_data_class(request: Request, data: Annotated[ClassDataPydanticSen
                           session: AsyncSession = SessionDep):
     name_class = data.name_class
     count_ill = data.count_ill
-    date_send = data.date
+    date_send = date.today()
     count_day = data.count_day
     closed = data.closed
 
