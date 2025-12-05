@@ -2,13 +2,13 @@ from datetime import timedelta, date
 
 from loguru import logger
 from pydantic import BaseModel
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, desc
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import BaseCRUD
 from app.auth.models import User
-from app.models.models import Dish, Menu
+from app.models.models import Dish, Menu, Class, DataSend
 
 
 class UserCRUD(BaseCRUD):
@@ -65,6 +65,7 @@ class UserCRUD(BaseCRUD):
             raise e
         return new_instance
 
+
 class DishCRUD(BaseCRUD):
     model = Dish
 
@@ -73,6 +74,13 @@ class DishCRUD(BaseCRUD):
         query = select(cls.model).filter_by(id=dish_id)
         result = await session.execute(query)
         return result.scalar_one_or_none()
+
+    @classmethod
+    async def get_dish_by_name(cls, session: AsyncSession, dish_name: str) -> Dish:
+        query = select(cls.model).filter_by(title=dish_name)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
 
 class MenuCRUD(BaseCRUD):
     model = Menu
@@ -106,3 +114,43 @@ class MenuCRUD(BaseCRUD):
         query = select(cls.model).filter(and_(cls.model.date_menu >= left_date, cls.model.date_menu <= right_date))
         result = await session.execute(query)
         return result.scalars().all()
+
+
+class ClassCRUD(BaseCRUD):
+    model = Class
+
+    @classmethod
+    async def get_class_by_one(cls, session: AsyncSession, name_class: str) -> Class:
+        query = select(cls.model).filter(cls.model.name_class == name_class)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
+    @classmethod
+    async def get_all(cls, session: AsyncSession):
+        query = select(cls.model).order_by('name_class')
+        result = await session.execute(query)
+        records = result.scalars().all()
+        return records
+
+
+class DataSendCRUD(BaseCRUD):
+    model = DataSend
+
+    @classmethod
+    async def get_sends_status_by_from_date(cls, session: AsyncSession, day: date):
+        query = select(cls.model).filter(cls.model.date_send == day)
+        result = await session.execute(query)
+        return result.scalars().first()
+
+    @classmethod
+    async def get_datasend_by_one_day(cls, session: AsyncSession, day: date) -> DataSend:
+        query = select(cls.model).filter(cls.model.date_send == day)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
+    @classmethod
+    async def get_last_by_30(cls, session: AsyncSession):
+        query = select(cls.model).order_by(desc('created_at')).limit(30)
+        result = await session.execute(query)
+        records = result.scalars().all()
+        return records

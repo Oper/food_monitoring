@@ -1,3 +1,4 @@
+import datetime
 from datetime import date
 
 from sqlalchemy import func, ForeignKey
@@ -38,3 +39,28 @@ class Menu(Base):
         back_populates='menus'
     )
 
+
+class Class(Base):
+    __tablename__ = 'classes'
+
+    name_class: Mapped[str] = mapped_column(unique=True)
+    man_class: Mapped[str]
+    count_ill: Mapped[int]
+    count_class: Mapped[int]
+    proc_ill: Mapped[int] = mapped_column(nullable=True)
+    closed: Mapped[bool] = mapped_column(nullable=True)
+    date_closed: Mapped[datetime.date] = mapped_column(nullable=True)
+    date_open: Mapped[datetime.date] = mapped_column(nullable=True)
+    date: Mapped[datetime.date] = mapped_column(nullable=True)
+
+
+class DataSend(Base):
+    __tablename__ = 'datasends'
+
+    date_send: Mapped[date] = mapped_column(unique=True)
+    count_all_ill: Mapped[int]
+    count_all: Mapped[int]
+    count_class_closed: Mapped[int]
+    count_ill_closed: Mapped[int]
+    count_all_closed: Mapped[int]
+    sending: Mapped[bool]

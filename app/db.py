@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import AsyncGenerator, Annotated
+from functools import wraps
+from typing import AsyncGenerator, Annotated, Callable
 
 from fastapi import Depends
 from sqlalchemy import Integer, func
@@ -10,13 +11,13 @@ from loguru import logger
 
 from app import config
 
-
 DATABASE_URL = config.get_link_db('postgresql+asyncpg')
 
 engine = create_async_engine(url=DATABASE_URL)
 
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 str_uniq = Annotated[str, mapped_column(unique=True, nullable=False)]
+
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
@@ -34,24 +35,83 @@ class Base(AsyncAttrs, DeclarativeBase):
         return cls.__name__.lower() + 's'
 
 
-@asynccontextmanager
-async def managed_session() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_maker() as session:
+class DatabaseSessionManager:
+    """
+    Класс для управления асинхронными сессиями базы данных.
+    """
+
+    def __init__(self, session_maker: async_sessionmaker[AsyncSession]):
+        self.session_maker = session_maker
+
+    @asynccontextmanager
+    async def create_session(self) -> AsyncGenerator[AsyncSession, None]:
+        """
+        Создаёт и предоставляет новую сессию базы данных.
+        Гарантирует закрытие сессии по завершении работы.
+        """
+        async with self.session_maker() as session:
+            try:
+                yield session
+            except Exception as e:
+                logger.error(f"Ошибка при создании сессии базы данных: {e}")
+                raise
+            finally:
+                await session.close()
+
+    @asynccontextmanager
+    async def transaction(self, session: AsyncSession) -> AsyncGenerator[None, None]:
+        """
+        Управление транзакцией: коммит при успехе, откат при ошибке.
+        """
         try:
-            yield session
+            yield
             await session.commit()
         except Exception as e:
             await session.rollback()
-            logger.exception(f"Database session error: {str(e)}")
+            logger.exception(f"Ошибка транзакции: {e}")
             raise
-        finally:
-            await session.close()
 
 
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    async with managed_session() as session:
-        yield session
+    async def get_transaction_session(self) -> AsyncGenerator[AsyncSession, None]:
+        """
+        Зависимость для FastAPI, возвращающая сессию с управлением транзакцией.
+        """
+        async with self.create_session() as session:
+            async with self.transaction(session):
+                yield session
 
+    def connection(self):
+        """
+        Декоратор для управления сессией
+        """
+
+        def decorator(method):
+            @wraps(method)
+            async def wrapper():
+                async with self.session_maker() as session:
+                    try:
+                        result = await method(session=session)
+                        await session.commit()
+                        return result
+                    except Exception as e:
+                        await session.rollback()
+                        logger.error(f"Ошибка при выполнении транзакции: {e}")
+                        raise
+                    finally:
+                        await session.close()
+
+            return wrapper
+
+        return decorator
+
+
+    @property
+    def transaction_session_dependency(self) -> Callable:
+        """Возвращает зависимость для FastAPI с поддержкой транзакций."""
+        return Depends(self.get_transaction_session)
+
+
+session_manager = DatabaseSessionManager(async_session_maker)
 
 # Dependency для использования в маршрутах FastAPI
-SessionDep = Depends(get_session)
+SessionDep = session_manager.transaction_session_dependency
