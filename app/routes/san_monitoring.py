@@ -26,7 +26,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     title = 'Санитарно-эпидемиологическая обстановка в Школе'
 
     current_date = date.today()
-    classes_list = {}
+    classes_list: dict = {}
 
     count_all_ill = 0
     count_all = 0
@@ -82,7 +82,6 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
             send_status = sending_mail_data.sending
     except Exception as e:
         logger.error(e)
-
     status = f'Данные на {current_date.isoformat()} отправлены в Cектор' if send_status else 'Данные не отправлены в сектор'
     full_status = 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-success-subtle border border-success rounded-2' if send_status else 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-secondary-subtle border border-danger rounded-2'
 
@@ -119,7 +118,7 @@ async def create_class(request: Request, data: Annotated[ClassPydanticIn, Form()
                                     date=date.today()))
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('admin_monitoring').include_query_params(msg="Succesfully created!")
+    redirect_url = request.url_for('admin_monitoring').include_query_params(msg="Successfully created!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -131,7 +130,7 @@ async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()],
         await ClassCRUD.delete(session=session, filters=ClassPydanticOne(name_class=name_class))
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('admin_monitoring').include_query_params(msg="Succesfully deleted!")
+    redirect_url = request.url_for('admin_monitoring').include_query_params(msg="Successfully deleted!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -191,7 +190,7 @@ async def send_data_class(request: Request, data: Annotated[ClassDataPydanticSen
 
     except Exception as e:
         logger.error(e)
-    redirect_url = request.url_for('monitoring').include_query_params(msg="Succesfully send data!")
+    redirect_url = request.url_for('monitoring').include_query_params(msg="Successfully send data!")
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -200,7 +199,7 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
                            session: AsyncSession = SessionDep):
     title = 'Панель управления классами'
 
-    classes_list = {}
+    classes_list: dict = {}
 
     try:
         all_classes = await ClassCRUD.get_all(session=session)
@@ -229,7 +228,7 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
 @router.get('/analysis', response_class=HTMLResponse)
 async def analysis(request: Request, session: AsyncSession = SessionDep):
     title = 'Анализ заболеваемости'
-    json_data = {}
+    json_data: dict = {}
     labels = []
     data = []
     data_class_closed = []
