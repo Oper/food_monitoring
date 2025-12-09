@@ -1,3 +1,4 @@
+import datetime
 from datetime import date, timedelta
 from typing import Annotated
 from venv import logger
@@ -9,6 +10,7 @@ from starlette import status
 from starlette.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+import app.config as config
 from app.db import SessionDep
 from app.crud.crud import ClassCRUD, DataSendCRUD
 from app.schemas.classes import ClassPydanticIn, ClassPydanticOne, ClassDataPydanticAdd, ClassDataPydanticSend, \
@@ -86,7 +88,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     full_status = 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-success-subtle border border-success rounded-2' if send_status else 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-secondary-subtle border border-danger rounded-2'
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
-                                      context={'title': title, 'date_current': current_date,
+                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': current_date,
                                                'count_all_ill': count_all_ill, 'count_all': count_all,
                                                'proc_all': proc_all, 'send_status': status, 'classes': classes_list,
                                                'full_status': full_status})
@@ -222,7 +224,7 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='admin_monitoring.html',
-                                      context={'title': title, 'classes': classes_list})
+                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': datetime.date.today(), 'classes': classes_list})
 
 
 @router.get('/analysis', response_class=HTMLResponse)
@@ -251,5 +253,5 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='analysis.html',
-                                      context={'title': title, 'json_data': json_data, 'labels': labels, 'data': data,
+                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': datetime.date.today(), 'json_data': json_data, 'labels': labels, 'data': data,
                                                'data_class_closed': data_class_closed})

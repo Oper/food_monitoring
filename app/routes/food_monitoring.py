@@ -10,6 +10,7 @@ from starlette import status
 from starlette.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 
+import app.config as config
 from app.db import SessionDep
 from app.crud.crud import MenuCRUD, DishCRUD
 from app.auth.dependencies import get_current_user
@@ -23,7 +24,7 @@ router = APIRouter(prefix='/nutritions', tags=['food'])
 
 @router.get('/', response_class=HTMLResponse)
 async def nutritions(request: Request, session: AsyncSession = SessionDep):
-    title = 'Питание МБОУ "СОШ№1" г.Емвы'
+    title = 'Питание Школы'
     menu_list = []
     current_date = date.today().isoformat()
     try:
@@ -38,7 +39,7 @@ async def nutritions(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='nutritions.html',
-                                      context={'title': title, 'date_todey': current_date, 'menu_list': menu_list})
+                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': datetime.today(), 'date_todey': current_date, 'menu_list': menu_list})
 
 
 @router.get('/admin', response_class=HTMLResponse)
@@ -100,7 +101,7 @@ async def admin_nutritions(request: Request, user_data: User = Depends(get_curre
                 result_menus[date]['out_lunch'] = result_menus[date].get('out_lunch', 0) + dish.out_gramm
 
     return templates.TemplateResponse(request=request, name='admin_nutritions.html',
-                                      context={'title': title, 'dishes': dishes, 'menus': menus,
+                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': datetime.today(), 'dishes': dishes, 'menus': menus,
                                                'result': result_menus})
 
 
@@ -126,7 +127,7 @@ async def menu_in_date(date_menu: str, request: Request, session: AsyncSession =
                 })
 
     return templates.TemplateResponse(request=request, name='menu_today.html',
-                                      context={'title': title, 'menu': menu_today})
+                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': date.today(), 'menu': menu_today})
 
 
 @router.post('/send_dish/')
@@ -196,6 +197,7 @@ async def get_file_menu_for_monitoring(date_menu: str, session: AsyncSession = S
     sheet = wb['1']
     current_date_menu = datetime.strptime(date_menu, "%Y-%m-%d").date()
     sheet['J1'] = current_date_menu
+    sheet['B1'] = config.SCHOOL
     result_filename = date_menu + '-sm.xlsx'
     menus_db_by_day = await MenuCRUD.get_category_menus_one_day(session=session, day=current_date_menu)
     if menus_db_by_day:
@@ -296,7 +298,7 @@ async def get_file_menu_for_monitoring(date_menu: str, session: AsyncSession = S
                     sheet['H15'] = dish.protein
                     sheet['I15'] = dish.fats
                     sheet['J15'] = dish.carb
-                elif dish.section == 'сладкое':
+                elif dish.section == 'напиток':
                     if dish.recipe != 0:
                         sheet['C16'] = dish.recipe
                     sheet['D16'] = dish.title
