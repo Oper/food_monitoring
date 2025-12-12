@@ -14,7 +14,7 @@ import app.config as config
 from app.db import SessionDep
 from app.crud.crud import ClassCRUD, DataSendCRUD
 from app.schemas.classes import ClassPydanticIn, ClassPydanticOne, ClassDataPydanticAdd, ClassDataPydanticSend, \
-    ClassDataPydantic
+    ClassDataPydantic, ClassDataPydanticOpen, ClassDataPydanticClosed
 from app.auth.dependencies import get_current_user
 from app.auth.models import User
 
@@ -88,7 +88,8 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     full_status = 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-success-subtle border border-success rounded-2' if send_status else 'd-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-secondary-subtle border border-danger rounded-2'
 
     return templates.TemplateResponse(request=request, name='monitoring.html',
-                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': current_date,
+                                      context={'title': title, 'title_school': config.SCHOOL,
+                                               'date_current': current_date,
                                                'count_all_ill': count_all_ill, 'count_all': count_all,
                                                'proc_all': proc_all, 'send_status': status, 'classes': classes_list,
                                                'full_status': full_status})
@@ -133,6 +134,26 @@ async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()],
     except Exception as e:
         logger.error(e)
     redirect_url = request.url_for('admin_monitoring').include_query_params(msg="Successfully deleted!")
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post('/closing_class/')
+async def del_class(request: Request, data: Annotated[ClassDataPydanticClosed, Form()],
+                    user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
+    name_class = data.name_class
+    closed = data.closed
+    date_closed = data.date_closed
+    date_open = data.date_open
+    print(date_open, date_closed)
+    try:
+        await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
+                               values=ClassDataPydanticOpen(closed=closed, date_closed=date_closed,
+                                                            date_open=date_open))
+    except Exception as e:
+        logger.error(e)
+        redirect_url = request.url_for('404').include_query_params(msg='ERROR closing class!')
+        return RedirectResponse(redirect_url, status_code=status.HTTP_304_NOT_MODIFIED)
+    redirect_url = request.url_for('admin_monitoring').include_query_params(msg='Successfully closed!')
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -224,7 +245,8 @@ async def admin_monitoring(request: Request, user_data: User = Depends(get_curre
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='admin_monitoring.html',
-                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': datetime.date.today(), 'classes': classes_list})
+                                      context={'title': title, 'title_school': config.SCHOOL,
+                                               'date_current': datetime.date.today(), 'classes': classes_list})
 
 
 @router.get('/analysis', response_class=HTMLResponse)
@@ -253,5 +275,7 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
         logger.error(e)
 
     return templates.TemplateResponse(request=request, name='analysis.html',
-                                      context={'title': title, 'title_school': config.SCHOOL, 'date_current': datetime.date.today(), 'json_data': json_data, 'labels': labels, 'data': data,
+                                      context={'title': title, 'title_school': config.SCHOOL,
+                                               'date_current': datetime.date.today(), 'json_data': json_data,
+                                               'labels': labels, 'data': data,
                                                'data_class_closed': data_class_closed})

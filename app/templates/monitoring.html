@@ -76,7 +76,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="sendDataModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="sendDataModal" tabindex="-1" aria-labelledby="sendModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -87,51 +87,50 @@
                     <form action="/monitoring/send_data_class" class="row gy-2 gx-3" method="post">
                         <div class="col-sm-6">
                             <div class="form-floating">
-                                    <select class="form-select" id="floatingSelectGridNameClass" name="name_class">
-                                        {% for j_key, j_value in classes.items() %}
-                                        <option>{{ j_key }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <label for="floatingSelectGridNameClass">Выбор класса</label>
+                                <select class="form-select" id="floatingSelectGridNameClass" name="name_class">
+                                    {% for j_key, j_value in classes.items() %}
+                                    <option>{{ j_key }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="floatingSelectGridNameClass">Выбор класса</label>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-floating">
-                                    <select class="form-select" id="floatingSelectGridCountIll" name="count_ill">
-                                        <option>0</option>
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                        <option>6</option>
-                                        <option>7</option>
-                                        <option>8</option>
-                                        <option>9</option>
-                                        <option>10</option>
-                                    </select>
-                                    <label for="floatingSelectGridCountIll">Число болеющих</label>
+                                <select class="form-select" id="floatingSelectGridCountIll" name="count_ill">
+                                    <option>0</option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                    <option>8</option>
+                                    <option>9</option>
+                                    <option>10</option>
+                                </select>
+                                <label for="floatingSelectGridCountIll">Число болеющих</label>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="input-group input-group-sm mb-3">
-                                    <span class="input-group-text" id="count_days">Количество дней</span>
-                                    <input type="number" class="form-control" id="basic-url"
-                                           aria-describedby="count_days" value="7" name="count_day">
+                                <span class="input-group-text" id="count_days">Количество дней</span>
+                                <input type="number" class="form-control" id="basic-url"
+                                       aria-describedby="count_days" value="7" name="count_day">
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="opens_off" name="closed"
-                                               value="0">
-                                        <label  class="form-check-label" for="opens_off">Не закрывать</label>
-                                        <input class="d-none" type="radio" id="opens_on" name="closed" value="1"
-                                               checked>
+                                <input class="d-none" type="radio" id="opens_off" name="closed"
+                                       value="0">
+                                <input class="d-none" type="radio" id="opens_on" name="closed" value="1"
+                                       checked>
                             </div>
                         </div>
                         <div class="col-auto">
-                                <input class="d-none" type="date" name="date" value={{ date_current }}>
-                                <button type="submit" class="btn btn-primary align-middle">Отправить</button>
+                            <input class="d-none" type="date" name="date" value={{ date_current }}>
+                            <button type="submit" class="btn btn-primary align-middle">Отправить</button>
                         </div>
                     </form>
                 </div>

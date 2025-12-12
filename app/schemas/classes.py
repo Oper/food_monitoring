@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from datetime import date
 
 
@@ -48,7 +48,31 @@ class ClassDataPydanticAdd(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
+
 class ClassDataPydanticOpen(BaseModel):
     closed: bool
     date_closed: date | None
     date_open: date | None
+
+
+class ClassDataPydanticClosed(BaseModel):
+    name_class: str
+    closed: bool
+    date_closed: date | None
+    date_open: date | None
+
+    @field_validator('closed', mode='before')
+    def check_closed(cls, v: str):
+        if v == 'Открыть':
+            return False
+        elif v == 'Закрыть':
+            return True
+        else:
+            raise ValueError
+
+    @model_validator(mode='after')
+    def set_date_is_not_closed(self):
+        if not self.closed:
+            self.date_closed = None
+            self.date_open = None
+        return self

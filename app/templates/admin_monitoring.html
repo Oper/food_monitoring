@@ -23,6 +23,7 @@
                 <th scope="col">Классный руководитель</th>
                 <th scope="col">Количество болеющих</th>
                 <th scope="col">Количество в классе</th>
+                <th scope="col">Статус класса</th>
                 <th scope="col">Управление</th>
             </tr>
             </thead>
@@ -35,6 +36,7 @@
                 <td>{{ item.man_class }}</td>
                 <td class="text-center">{{ item.count_ill }}</td>
                 <td class="text-center">{{ item.count_class }}</td>
+                <td class="text-center">{{ 'Закрыт' if item.closed else 'Открыт' }}</td>
                 <td class="text-center">
                     <form action="/monitoring/del_class/" method="post">
                         <input type="text" class="d-none" name="name_class" value="{{ j_key }}">
@@ -51,6 +53,9 @@
             </div>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClassModal">
                 Добавить\редактировать класс
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#optionDataModal">
+                Управлять классом
             </button>
         </div>
     </div>
@@ -89,13 +94,65 @@
         </div>
     </div>
 </div>
-
+<!-- Modal options class-->
+<div class="modal fade" id="optionDataModal" tabindex="-1" aria-labelledby="optionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="optionModalLabel">Управлять классом</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/monitoring/closing_class/" class="row gy-2 gx-3" method="post">
+                    <div class="col-sm-6">
+                        <div class="form-floating">
+                            <select class="form-select" id="floatingSelectGridNameClass" name="name_class">
+                                {% for j_key, j_value in classes.items() %}
+                                <option>{{ j_key }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelectGridNameClass">Выбор класса</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-floating">
+                            <select class="form-select" id="floatingSelectGridOption" name="closed">
+                                <option>Закрыть</option>
+                                <option>Открыть</option>
+                            </select>
+                            <label for="floatingSelectGridOption">Действие</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text" id="date_closed">Дата закрытия</span>
+                            <input type="date" name="date_closed" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text" id="date_open">Закрыт до (включительно)</span>
+                            <input type="date" name="date_open" required>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary align-middle">Отправить</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container">
     <footer class="py-3 my-4">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="../" class="nav-link px-2 text-body-secondary">Главная</a></li>
             <li class="nav-item"><a href="../monitoring" class="nav-link px-2 text-body-secondary">Мониторинг</a></li>
-            <li class="nav-item"><a href="../monitoring/admin" class="nav-link px-2 text-body-secondary">Панель управления</a></li>
+            <li class="nav-item"><a href="../monitoring/admin" class="nav-link px-2 text-body-secondary">Панель
+                управления</a></li>
             <li class="nav-item"><a href="/auth/logout" class="nav-link px-2 text-body-secondary">Выход</a></li>
         </ul>
         <p class="text-center text-body-secondary">2024 - {{ date_current.year }} © {{ title_school }}</p>
