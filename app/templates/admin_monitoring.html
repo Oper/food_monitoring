@@ -153,7 +153,11 @@
             <li class="nav-item"><a href="../monitoring" class="nav-link px-2 text-body-secondary">Мониторинг</a></li>
             <li class="nav-item"><a href="../monitoring/admin" class="nav-link px-2 text-body-secondary">Панель
                 управления</a></li>
-            <li class="nav-item"><a href="/auth/logout" class="nav-link px-2 text-body-secondary">Выход</a></li>
+            <li class="nav-item">
+                <form action="/auth/logout/" method="post">
+                    <button type="submit" class="nav-link px-2 text-body-secondary">Выход</button>
+                </form>
+            </li>
         </ul>
         <p class="text-center text-body-secondary">2024 - {{ date_current.year }} © {{ title_school }}</p>
     </footer>
