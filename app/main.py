@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 from venv import logger
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from starlette import status
+from starlette.responses import RedirectResponse, JSONResponse
 
 from app.auth.router import router as router_auth
 from app.routes.food_monitoring import router as router_food
@@ -95,3 +97,14 @@ app.include_router(router_san)
 async def not_found(request: Request):
     title = 'Страница не найдена'
     return templates.TemplateResponse(request=request, name='404.html', context={'title': title})
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    if exc.status_code == 401:
+        return RedirectResponse(url='/login', status_code=status.HTTP_302_FOUND)
+
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
