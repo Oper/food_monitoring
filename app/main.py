@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from datetime import datetime
 from venv import logger
 
 from fastapi import FastAPI, Request, HTTPException
@@ -14,7 +15,7 @@ from app.routes.food_monitoring import router as router_food
 from app.routes.san_monitoring import router as router_san
 from app.scheduler.datasend import add_datasend, update_class
 from app.scheduler.datasend import send_datasend
-
+from app.db import create_all_tables
 
 scheduler = AsyncIOScheduler()
 
@@ -29,6 +30,11 @@ async def lifespan(app: FastAPI):
     """
     try:
         # Настройка и запуск планировщика
+        scheduler.add_job(
+            create_all_tables,
+            trigger="date",
+            run_date=datetime.now(),
+        )
         scheduler.add_job(
             add_datasend,
             'cron',

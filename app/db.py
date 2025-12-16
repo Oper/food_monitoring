@@ -34,6 +34,10 @@ class Base(AsyncAttrs, DeclarativeBase):
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
 
+async def create_all_tables():
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+
 
 class DatabaseSessionManager:
     """
