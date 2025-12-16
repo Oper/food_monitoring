@@ -54,9 +54,8 @@ class ClassDataPydanticOpen(BaseModel):
     date_closed: date | None
     date_open: date | None
 
+class ClassesDataPydanticClosed(BaseModel):
 
-class ClassDataPydanticClosed(BaseModel):
-    name_class: str
     closed: bool
     date_closed: date | None
     date_open: date | None
@@ -76,3 +75,6 @@ class ClassDataPydanticClosed(BaseModel):
             self.date_closed = None
             self.date_open = None
         return self
+
+class ClassDataPyndantiClosed(ClassesDataPydanticClosed):
+    name_class: str

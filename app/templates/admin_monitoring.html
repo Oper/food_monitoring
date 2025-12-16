@@ -55,7 +55,10 @@
                 Добавить\редактировать класс
             </button>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#optionDataModal">
-                Управлять классом
+                Управление классом
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#closingSchoolModal">
+                Управление школой
             </button>
         </div>
     </div>
@@ -132,6 +135,49 @@
                     <div class="col-sm-6">
                         <div class="input-group input-group-sm mb-3">
                             <span class="input-group-text" id="date_open">Закрыт до (включительно)</span>
+                            <input type="date" name="date_open" required>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary align-middle">Отправить</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal options school-->
+<div class="modal fade" id="closingSchoolModal" tabindex="-1" aria-labelledby="closingSchoolModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="closingSchoolModalLabel">Закрыть школу</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/monitoring/closing_school/" class="row gy-2 gx-3" method="post">
+
+                    <div class="col-sm-12">
+                        <div class="form-floating">
+                            <select class="form-select" id="floatingSelectGridOptionBool" name="closed">
+                                <option>Закрыть</option>
+                                <option>Открыть</option>
+                            </select>
+                            <label for="floatingSelectGridOptionBool">Действие</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text" id="date_closed_school">Дата закрытия</span>
+                            <input type="date" name="date_closed" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text" id="date_open_school">Закрыт до (включительно)</span>
                             <input type="date" name="date_open" required>
                         </div>
                     </div>

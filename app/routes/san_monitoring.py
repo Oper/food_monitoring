@@ -14,7 +14,8 @@ import app.config as config
 from app.db import SessionDep
 from app.crud.crud import ClassCRUD, DataSendCRUD
 from app.schemas.classes import ClassPydanticIn, ClassPydanticOne, ClassDataPydanticAdd, ClassDataPydanticSend, \
-    ClassDataPydantic, ClassDataPydanticOpen, ClassDataPydanticClosed
+    ClassDataPydantic, ClassDataPydanticOpen, ClassDataPyndantiClosed, \
+    ClassesDataPydanticClosed
 from app.auth.dependencies import get_current_user
 from app.auth.models import User
 
@@ -138,13 +139,12 @@ async def del_class(request: Request, data: Annotated[ClassPydanticOne, Form()],
 
 
 @router.post('/closing_class/')
-async def del_class(request: Request, data: Annotated[ClassDataPydanticClosed, Form()],
+async def del_class(request: Request, data: Annotated[ClassDataPyndantiClosed, Form()],
                     user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
     name_class = data.name_class
     closed = data.closed
     date_closed = data.date_closed
     date_open = data.date_open
-    print(date_open, date_closed)
     try:
         await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=name_class),
                                values=ClassDataPydanticOpen(closed=closed, date_closed=date_closed,
@@ -154,6 +154,28 @@ async def del_class(request: Request, data: Annotated[ClassDataPydanticClosed, F
         redirect_url = request.url_for('404').include_query_params(msg='ERROR closing class!')
         return RedirectResponse(redirect_url, status_code=status.HTTP_304_NOT_MODIFIED)
     redirect_url = request.url_for('admin_monitoring').include_query_params(msg='Successfully closed!')
+    return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post('/closing_school/')
+async def del_class(request: Request, data: Annotated[ClassesDataPydanticClosed, Form()],
+                    user_data: User = Depends(get_current_user), session: AsyncSession = SessionDep):
+    closed = data.closed
+    date_closed = data.date_closed
+    date_open = data.date_open
+    try:
+        all_classes = await ClassCRUD.get_all(session=session)
+        if all_classes and closed:
+            for cls in all_classes:
+                await ClassCRUD.update(session=session, filters=ClassPydanticOne(name_class=cls.name_class),
+                                       values=ClassDataPydanticOpen(closed=closed, date_closed=date_closed,
+                                                                    date_open=date_open))
+
+    except Exception as e:
+        logger.error(e)
+        redirect_url = request.url_for('404').include_query_params(msg='ERROR closing school!')
+        return RedirectResponse(redirect_url, status_code=status.HTTP_304_NOT_MODIFIED)
+    redirect_url = request.url_for('admin_monitoring').include_query_params(msg='Successfully closed school!')
     return RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
