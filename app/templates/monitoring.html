@@ -50,8 +50,8 @@
                 <td class="text-center {{ " table-danger
                 " if item.proc_ill > 20 }}">{{ item.proc_ill }}</td>
                 <td class="text-center {{ " table-success
-                " if item.date == date_current else "table-warning" }}">{{ item.date }}</td>
-                <td colspan="2"></td>
+                " if item.date == date_current else "table-warning" }}">{{ item.date.strftime("%d.%m.%Y") }}</td>
+                <td colspan="2" class="text-center table-light">Карантин</td>
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -67,11 +67,11 @@
                 <td class="text-center {{ " table-danger
                 " if item.proc_ill > 20 }}">{{ item.proc_ill }}</td>
                 <td class="text-center {{ " table-success
-                " if item.date == date_current else "table-warning" }}">{{ item.date }}</td>
+                " if item.date == date_current else "table-warning" }}">{{ item.date.strftime("%d.%m.%Y") }}</td>
                 <td class="text-center {{ " table-danger
-                " if item.date_closed != None }}">{{ " " if item.date_closed == None else item.date_closed }}</td>
+                " if item.date_closed != None }}">{{ " " if item.date_closed == None else item.date_closed.strftime("%d.%m.%Y") }}</td>
                 <td class="text-center {{ " table-danger
-                " if item.date_closed != None }}">{{ " " if item.date_open == None else item.date_open }}</td>
+                " if item.date_closed != None }}">{{ " " if item.date_open == None else item.date_open.strftime("%d.%m.%Y") }}</td>
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -86,8 +86,8 @@
                 <td class="table-active text-center {{ " table-danger
                 " if proc_all > 20 }}">{{ proc_all }}</td>
                 {% if school_status[0] %}
-                <td class="text-center"><b>Школа закрыта по:</b></td>
-                <td colspan="2" class="text-center table-danger">{{ school_status[1] }}</td>
+                <td class="text-center table-light"><b>Школа закрыта по:</b></td>
+                <td colspan="2" class="text-center table-danger">{{ school_status[1].strftime("%d.%m.%Y") }}</td>
                 {% else %}
                 <td colspan="3"></td>
                 {% endif %}
