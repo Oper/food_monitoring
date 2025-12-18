@@ -38,6 +38,24 @@
             </tr>
             </thead>
             <tbody class="table-group-divider">
+            {% if school_status[0] %}
+            {% for j_key, j_value in classes.items() %}
+            <tr>
+                {% for item in j_value %}
+                <th class="text-center" scope="row">{{ item.id }}</th>
+                <td class="text-center">{{ j_key }}</td>
+                <td>{{ item.man_class }}</td>
+                <td class="text-center">{{ item.count_ill }}</td>
+                <td class="text-center">{{ item.count_class }}</td>
+                <td class="text-center {{ " table-danger
+                " if item.proc_ill > 20 }}">{{ item.proc_ill }}</td>
+                <td class="text-center {{ " table-success
+                " if item.date == date_current else "table-warning" }}">{{ item.date }}</td>
+                <td colspan="2"></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            {% else %}
             {% for j_key, j_value in classes.items() %}
             <tr>
                 {% for item in j_value %}
@@ -57,6 +75,7 @@
                 {% endfor %}
             </tr>
             {% endfor %}
+            {% endif %}
             </tbody>
             <tfoot>
             <tr>
