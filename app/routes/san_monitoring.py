@@ -34,6 +34,8 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
     count_all_ill = 0
     count_all = 0
 
+    count_closed_classes = 0
+    school_data = [False]
     try:
         all_classes = await ClassCRUD.get_all(session=session)
         if all_classes:
@@ -57,6 +59,9 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
                     })
                     count += 1
             for count_id, _class in enumerate(all_classes, start=count):
+                if _class.closed:
+                    count_closed_classes += 1
+                    school_data.append(_class.date_open)
                 if len(_class.name_class) == 3:
                     count_all += _class.count_class
                     count_all_ill += _class.count_ill
@@ -73,6 +78,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
                         'date_open': _class.date_open,
                         'date': _class.date
                     })
+            school_data[0] = True if count_closed_classes == len(all_classes) else False
     except Exception as e:
         logger.error(e)
 
@@ -93,7 +99,7 @@ async def monitoring(request: Request, session: AsyncSession = SessionDep):
                                                'date_current': current_date,
                                                'count_all_ill': count_all_ill, 'count_all': count_all,
                                                'proc_all': proc_all, 'send_status': status, 'classes': classes_list,
-                                               'full_status': full_status})
+                                               'full_status': full_status, 'school_status': school_data,})
 
 
 @router.post('/create_class/')

@@ -60,16 +60,18 @@
             </tbody>
             <tfoot>
             <tr>
-                <th></th>
-                <td></td>
-                <td class="table-active text-center">Итого:</td>
+                <th colspan="2"></th>
+                <td class="table-active text-end">Итого:</td>
                 <td class="table-active text-center">{{ count_all_ill }}</td>
                 <td class="table-active text-center">{{ count_all }}</td>
                 <td class="table-active text-center {{ " table-danger
                 " if proc_all > 20 }}">{{ proc_all }}</td>
-                <td></td>
-                <td></td>
-                <td></td>
+                {% if school_status[0] %}
+                <td class="text-center"><b>Школа закрыта по:</b></td>
+                <td colspan="2" class="text-center table-danger">{{ school_status[1] }}</td>
+                {% else %}
+                <td colspan="3"></td>
+                {% endif %}
             </tr>
             </tfoot>
         </table>
@@ -163,6 +165,12 @@
             </div>
         </div>
     </div>
+    <script>
+        const selector = document.getElementById('floatingSelectGridCountIll');
+        selector.addEventListener('change', function() {
+        if (this.value > 5) {
+
+    </script>
 </div>
 <div class="container">
     <footer class="py-3 my-4">
