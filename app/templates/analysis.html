@@ -53,7 +53,7 @@
                     <tr>
                         {% for item in j_value %}
                         <td>{{ item.id }}</td>
-                        <td>{{ j_key }}</td>
+                        <td>{{ j_key.strftime("%d.%m.%Y") }}</td>
                         <td>{{ item.count_all_ill }}</td>
                         <td>{{ item.count_class_closed }}</td>
                         {% endfor %}

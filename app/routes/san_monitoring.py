@@ -287,7 +287,7 @@ async def analysis(request: Request, session: AsyncSession = SessionDep):
     try:
         datasend_by_30 = await DataSendCRUD.get_last_by_30(session=session)
         for datasend in datasend_by_30:
-            labels.append(datasend.date_send.isoformat())
+            labels.append(datasend.date_send.strftime("%d.%m.%Y"))
             data.append(datasend.count_all_ill)
             data_class_closed.append(datasend.count_class_closed)
 
