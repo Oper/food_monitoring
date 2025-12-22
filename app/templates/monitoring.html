@@ -69,9 +69,11 @@
                 <td class="text-center {{ " table-success
                 " if item.date == date_current else "table-warning" }}">{{ item.date.strftime("%d.%m.%Y") }}</td>
                 <td class="text-center {{ " table-danger
-                " if item.date_closed != None }}">{{ " " if item.date_closed == None else item.date_closed.strftime("%d.%m.%Y") }}</td>
+                " if item.date_closed != None }}">{{ " " if item.date_closed == None else
+                item.date_closed.strftime("%d.%m.%Y") }}</td>
                 <td class="text-center {{ " table-danger
-                " if item.date_closed != None }}">{{ " " if item.date_open == None else item.date_open.strftime("%d.%m.%Y") }}</td>
+                " if item.date_closed != None }}">{{ " " if item.date_open == None else
+                item.date_open.strftime("%d.%m.%Y") }}</td>
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -142,6 +144,10 @@
                             </div>
                         </div>
                         <div class="col-sm-6">
+                            <div class="d-grid gap-2">
+                                <input class="d-none" type="date" name="date" value={{ date_current }}>
+                                <button type="submit" class="btn btn-primary btn-sm align-middle">Отправить</button>
+                            </div>
                             <div class="form-check">
                                 <input class="d-none" type="radio" id="opens_off" name="closed"
                                        value="0">
@@ -149,18 +155,130 @@
                                        checked>
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <input class="d-none" type="date" name="date" value={{ date_current }}>
-                            <button type="submit" class="btn btn-primary align-middle">Отправить</button>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-link btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#helpModal">
+                        Помощь по внесению данных
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Модальное окно -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg border-0">
+                <!-- Шапка -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="helpModalLabel">
+                        <i class="bi bi-info-circle me-2"></i>Краткая инструкция
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <!-- Содержимое -->
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <!-- Раздел FAQ -->
+                        <div class="col-md-7">
+                            <h6 class="fw-bold mb-3 text-uppercase small text-muted">Часто задаваемые вопросы</h6>
+                            <div class="accordion accordion-flush" id="faqAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#faq1">
+                                            Как отправить данные?
+                                        </button>
+                                    </h2>
+                                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body small text-muted">
+                                            Чтобы отправить данные по классу необходимо выбрать класс, выбрать
+                                            количество болеющих в классе и нажать кнопку "Отправить"
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#faq2">
+                                            В каком случае закрываем класс?
+                                        </button>
+                                    </h2>
+                                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body small text-muted">
+                                            <b>Ключевое условие</b> -
+                                            Учебный процесс в конкретном классе приостанавливается, если в нем
+                                            отсутствует 20% и более детей по причине болезни (ОРВИ, грипп).<br>
+                                            <i>(требования, установленные СанПиН 3.3686-21 «Санитарно-эпидемиологические
+                                                требования по профилактике инфекционных болезней».)</i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#faq3">
+                                            В каком случае закрываем Школу?
+                                        </button>
+                                    </h2>
+                                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body small text-muted">
+                                            <b>Ключевое условие</b> -
+                                            Учебный процесс в Школе приостанавливается, если
+                                            отсутствует 20% и более детей по причине болезни (ОРВИ, грипп).<br>
+                                            <i>(требования, установленные СанПиН 3.3686-21 «Санитарно-эпидемиологические
+                                                требования по профилактике инфекционных болезней».)</i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#faq4">
+                                            На сколько закрывают класс\Школу?
+                                        </button>
+                                    </h2>
+                                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body small text-muted">
+                                            Класс или Школу закрывают не менее чем на 7 дней (включительно).
+                                            По необходимости карантин продлевают не менее чем на 3 дня.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><br>
+                            <p><em>Решение по закрытию класса или Школы принимает Администрация Школы!</em></p>
+                        </div>
+
+                        <!-- Раздел сбора -->
+                        <div class="col-md-5 border-start">
+                            <h6 class="fw-bold mb-3 text-uppercase small text-muted">Сбор сведений</h6>
+                            <div class="d-grid gap-2">
+                                <div class="p-3 bg-light rounded-3 mt-2">
+                                    <p class="mb-1 fw-semibold small">Режим приема сведений:</p>
+                                    <p class="mb-0 x-small text-muted">Пн-Пт: 07:00 — 9:40<br>Сб-Вс: Выходной</p>
+                                </div>
+                                <div class="p-3 bg-light rounded-3 mt-2">
+                                    <p class="mb-1 fw-semibold small">Отправка сведений в УО:</p>
+                                    <p class="mb-0 x-small text-muted">Пн-Пт: 09:50 - 10:00<br>Сб-Вс: Выходной</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Подвал -->
+                <div class="modal-footer bg-light">
+                    <small class="text-muted me-auto">Версия системы: 1.3.6-2025</small>
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </br>
     <div class="container-md">
         <div class="row">
@@ -184,12 +302,6 @@
             </div>
         </div>
     </div>
-    <script>
-        const selector = document.getElementById('floatingSelectGridCountIll');
-        selector.addEventListener('change', function() {
-        if (this.value > 5) {
-
-    </script>
 </div>
 <div class="container">
     <footer class="py-3 my-4">
